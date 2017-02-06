@@ -1,0 +1,18 @@
+package Client;
+
+import java.io.Console;
+
+public class Main {
+
+	public static void main(String[] args) {
+		Client client;
+		System.out.println("Please input the host and port");
+		Console cons = System.console();
+		System.out.print("Host: ");
+		String host = cons.readLine();
+		System.out.print("Port: ");
+		String port = cons.readLine();
+		System.out.print(host + " " + port);
+	}
+
+}

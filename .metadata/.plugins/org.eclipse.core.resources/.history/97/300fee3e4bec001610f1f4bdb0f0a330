@@ -1,0 +1,23 @@
+
+
+import java.io.Console;
+
+public class Main {
+
+	public static void main(String[] args) {
+		//Client client;
+		System.out.println("Please input the host and port");
+		Console cons = System.console();
+		String host;
+		do {
+			System.out.print("Host: ");
+			host = cons.readLine();
+		} while (host != "localhost");
+		System.out.print("Port: ");
+		String port = cons.readLine();
+		System.out.println("Connecting to: " + host + " " + port);
+		
+		
+	}
+
+}
