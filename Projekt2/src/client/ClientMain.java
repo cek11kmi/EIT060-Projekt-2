@@ -92,13 +92,13 @@ public class ClientMain {
 			String option = cons.readLine();
 			switch (option) {
 			case "1":
-				System.out.println("Can't read right now");
+				client.sendMessage(option);
 				break;
 			case "2":
-				System.out.println("Can't edit right now");
+				client.sendMessage(option);
 				break;
 			case "3":
-				System.out.println("Can't do shit right now.");
+				client.sendMessage(option);
 				break;
 			case "0":
 				System.exit(0);
