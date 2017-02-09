@@ -36,7 +36,7 @@ public class Client {
     	this.kmf = kmf;
         try { /* set up a key manager for client authentication */
             try {
-               
+            	
                 TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
                 SSLContext ctx = SSLContext.getInstance("TLS");
                 
