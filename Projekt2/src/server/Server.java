@@ -27,7 +27,6 @@ public class Server implements Runnable {
             System.out.println("client name (cert subject DN field): " + subject);
             String issuer = cert.getIssuerDN().getName();
             System.out.println("issuer on certificate received from client:\n" + issuer + "\n");
- 
             System.out.println("serialnumber on certificate received from client:\n" + cert.getSerialNumber() + "\n");
             System.out.println(numConnectedClients + " concurrent connection(s)\n");
 
