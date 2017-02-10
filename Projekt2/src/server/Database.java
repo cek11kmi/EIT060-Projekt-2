@@ -63,26 +63,42 @@ public class Database {
         return conn != null;
     }
 
-//    public boolean userExists(String userName) {
-//    	PreparedStatement ps = null;
-//    	ResultSet rs = null;
-//        try {
-//            String sql =
-//                "SELECT *\n" +
-//                "FROM   users\n" +
-//                "WHERE  username = ?";
-//            ps = conn.prepareStatement(sql);
-//            ps.setString(1, userName);
-//            rs = ps.executeQuery();
-//            if (rs.next()){
-//            	return true;
-//            }
-//
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        } finally {
-//        	closePs(ps, rs);
-//        }
-//        return false;
-//    }
+    public boolean userExists(String serialNbr) {
+    	PreparedStatement ps = null;
+    	ResultSet rs = null;
+        try {
+            String sql =
+                "SELECT *\n" +
+                "FROM   users\n" +
+                "WHERE  serial_number = ?";
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, serialNbr);
+            rs = ps.executeQuery();
+            if (rs.next()){
+            	return true;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+        	closePs(ps, rs);
+        }
+        return false;
+    }
+    
+    
+    
+    
+    private void closePs(PreparedStatement ps, ResultSet rs){
+    	try {
+			if (ps != null){
+				ps.close();
+			}
+			if (rs != null){
+				rs.close();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+    }
 }

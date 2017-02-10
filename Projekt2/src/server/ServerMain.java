@@ -3,6 +3,7 @@ package server;
 import java.io.Console;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.net.ServerSocket;
 import java.security.KeyStore;
 
@@ -14,34 +15,33 @@ import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
 public class ServerMain {
-	private Server s;
 
 	public static void main(String[] args) {
-		String portString = "";
+		String portString = "9871";
 		Console cons = System.console();
-		if (args.length == 1) {
-			portString = args[0];
-		} else if (cons != null){
-			// Input host and port number
-			System.out.println("Please input the port");
-
-			System.out.print("Port: ");
-			portString = cons.readLine();
-
-		} else {
-			System.out.println("Start with ServerMain port");
-			System.exit(0);
-		}
+//		if (args.length == 1) {
+//			portString = args[0];
+//		} else if (cons != null){
+//			// Input host and port number
+//			System.out.println("Please input the port");
+//
+//			System.out.print("Port: ");
+//			portString = cons.readLine();
+//
+//		} else {
+//			System.out.println("Start with ServerMain port");
+//			//System.exit(0);
+//		}
+		
 		ServerMain sm = new ServerMain();
-		sm.startUp(portString);
 		Database db = new Database();
-		db.openConnection("serverassets/db/hospital.db");
-		
-		
+		sm.startUp(portString, db);
 
 	}
 	
-	private void startUp(String portString){	
+
+	
+	private void startUp(String portString, Database db){	
 		// this will convert string port to int
 		int port;
 		try {
@@ -55,7 +55,7 @@ public class ServerMain {
             ServerSocketFactory ssf = getServerSocketFactory(type);
             ServerSocket ss = ssf.createServerSocket(port);
             ((SSLServerSocket)ss).setNeedClientAuth(true); // enables client authentication
-            s = new Server(ss);
+            Server s = new Server(ss, db);
         } catch (IOException e) {
             System.out.println("Unable to start Server: " + e.getMessage());
             e.printStackTrace();
@@ -74,8 +74,8 @@ public class ServerMain {
 				KeyStore ts = KeyStore.getInstance("JKS");
                 char[] password = "password".toCharArray();
 
-                ks.load(new FileInputStream("../serverassets/serverkeystore"), password);  // keystore password (storepass)
-                ts.load(new FileInputStream("../serverassets/servertruststore"), password); // truststore password (storepass)
+                ks.load(new FileInputStream("serverassets/serverkeystore"), password);  // keystore password (storepass)
+                ts.load(new FileInputStream("serverassets/servertruststore"), password); // truststore password (storepass)
                 kmf.init(ks, password); // certificate password (keypass)
                 tmf.init(ts);  // possible to use keystore as truststore here
                 ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
@@ -89,5 +89,7 @@ public class ServerMain {
         }
         return null;
     }
+	
+
 
 }
