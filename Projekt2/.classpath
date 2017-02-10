@@ -2,11 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
-	<classpathentry kind="lib" path="src/sqlite-jdbc.jar"/>
-<<<<<<< Updated upstream
-	<classpathentry kind="lib" path="src/server/sqlite-jdbc.jar"/>
-=======
-	<classpathentry kind="lib" path="/h/d2/z/cek11kmi/eit060/p2/EIT060-Projekt-2/Projekt2/src/sqlite-jdbc.jar"/>
->>>>>>> Stashed changes
+	<classpathentry kind="lib" path="lib/sqlite-jdbc.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
