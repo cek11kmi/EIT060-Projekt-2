@@ -17,7 +17,7 @@ import javax.net.ssl.TrustManagerFactory;
 public class ServerMain {
 
 	public static void main(String[] args) {
-		String portString = "9871";
+		String portString = "9863";
 		Console cons = System.console();
 		if (args.length == 1) {
 			portString = args[0];

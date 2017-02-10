@@ -62,19 +62,19 @@ public class Database {
         return conn != null;
     }
 
-    public boolean userExists(String serialNbr) {
+    public String getUserTitle(String serialNbr) {
     	PreparedStatement ps = null;
     	ResultSet rs = null;
         try {
             String sql =
-                "SELECT *\n" +
+                "SELECT title\n" +
                 "FROM   users\n" +
                 "WHERE  serial_number = ?";
             ps = conn.prepareStatement(sql);
             ps.setString(1, serialNbr);
             rs = ps.executeQuery();
             if (rs.next()){
-            	return true;
+            	return rs.getString("title");
             }
 
         } catch (SQLException e) {
@@ -82,8 +82,78 @@ public class Database {
         } finally {
         	closePs(ps, rs);
         }
-        return false;
+        return "";
     }
+    
+    public String getPatientName(String serialNbr){
+    	PreparedStatement ps = null;
+    	ResultSet rs = null;
+        try {
+            String sql =
+                "SELECT name\n" +
+                "FROM   patients\n" +
+                "WHERE  serial_number = ?";
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, serialNbr);
+            rs = ps.executeQuery();
+            if (rs.next()){
+            	return rs.getString("name");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+        	closePs(ps, rs);
+        }
+        return "";
+    }
+    
+    public String getNurseName(String serialNbr){
+    	PreparedStatement ps = null;
+    	ResultSet rs = null;
+        try {
+            String sql =
+                "SELECT name\n" +
+                "FROM   nurses\n" +
+                "WHERE  serial_number = ?";
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, serialNbr);
+            rs = ps.executeQuery();
+            if (rs.next()){
+            	return rs.getString("name");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+        	closePs(ps, rs);
+        }
+        return "";
+    }
+    
+    public String getDoctorName(String serialNbr){
+    	PreparedStatement ps = null;
+    	ResultSet rs = null;
+        try {
+            String sql =
+                "SELECT name\n" +
+                "FROM   doctors\n" +
+                "WHERE  serial_number = ?";
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, serialNbr);
+            rs = ps.executeQuery();
+            if (rs.next()){
+            	return rs.getString("name");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+        	closePs(ps, rs);
+        }
+        return "";
+    }
+   
     
     
     

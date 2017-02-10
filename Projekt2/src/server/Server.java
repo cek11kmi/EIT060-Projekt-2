@@ -11,8 +11,8 @@ import javax.security.cert.X509Certificate;
 public class Server implements Runnable {
 	private ServerSocket serverSocket = null;
 	private static int numConnectedClients = 0;
-
 	private Database db;
+	
 
 	public Server(ServerSocket ss, Database db) throws IOException {
 		serverSocket = ss;
@@ -30,12 +30,41 @@ public class Server implements Runnable {
 			X509Certificate cert = (X509Certificate) session.getPeerCertificateChain()[0];
 			String subject = cert.getSubjectDN().getName();
 			numConnectedClients++;
+			
 			System.out.println("client connected");
-
-			if (!(authentication(cert.getSerialNumber()))) {
+			String serialNbrString = cert.getSerialNumber().toString();
+			
+			//Authenticates the client by comparing certificate 
+			//serial number with entries in database
+			//if title is not an empty string the user exists in the database
+			String title = authentication(serialNbrString);
+			
+			
+			if (title.equals("")) {
 				System.out.println("client not authenticated");
 			} else {
-				System.out.println("client authenticated");
+				
+				System.out.println("client authenticated");	
+				System.out.println("client title is " + title);
+				
+				//retrieves the users name from the database
+				String name = "";
+				switch (title) {
+				case "Patient": 
+					name = db.getPatientName(serialNbrString);  
+					break;
+				case "Nurse":
+					name = db.getNurseName(serialNbrString);
+					break;
+				case "Doctor":
+					name = db.getDoctorName(serialNbrString);
+					break;
+				case "Government":
+					System.out.println("client is government");
+				}
+				if (!name.equals("")){
+					System.out.println("client name is " + name);
+				}
 
 				System.out.println("client name (cert subject DN field): " + subject);
 				String issuer = cert.getIssuerDN().getName();
@@ -86,14 +115,12 @@ public class Server implements Runnable {
 
 	}
 
-	private boolean authentication(BigInteger serialNbr) {
-		String serialNbrString = "";
-		serialNbrString = serialNbr.toString();
-		if (!(serialNbr.equals(""))) {
-			return db.userExists(serialNbrString);
+	private String authentication(String serialNbrString) {
+		if (!(serialNbrString.equals(""))) {
+			return db.getUserTitle(serialNbrString);
 		} else {
 			System.out.println("Error retrieving cerificate serial number");
-			return false;
+			return "";
 		}
 	}
 }
