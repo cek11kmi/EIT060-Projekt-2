@@ -203,7 +203,8 @@ public class Database {
         return patientList;
     }
     
-    public MedicalRecord getMedicalRecord(String patientName){
+    public List<MedicalRecord> getMedicalRecord(String patientName){
+    	List<MedicalRecord> recordsList = new LinkedList<MedicalRecord>();
     	PreparedStatement ps = null;
     	ResultSet rs = null;
         try {
@@ -214,8 +215,8 @@ public class Database {
             ps = conn.prepareStatement(sql);
             ps.setString(1, patientName);
             rs = ps.executeQuery();
-            if (rs.next()){
-            	return new MedicalRecord(rs);
+            while (rs.next()){
+            	recordsList.add(new MedicalRecord(rs));
             }
 
         } catch (SQLException e) {
@@ -223,7 +224,7 @@ public class Database {
         } finally {
         	closePs(ps, rs);
         }
-        return null;
+        return recordsList;
     }
     
     public List<MedicalRecord> getMedicalRecordsByDivision(String division){
@@ -319,6 +320,25 @@ public class Database {
             ps.setString(3, mr.getNurseName());
             ps.setString(4, mr.getDivision());
             ps.setString(5, mr.getDisease());
+            ps.executeQuery();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+        	closePs(ps, rs);
+        }
+    }
+    
+    public boolean deleteMedicalRecord(MedicalRecord mr){
+    	PreparedStatement ps = null;
+    	ResultSet rs = null;
+        try {
+            String sql =
+                "DELETE FROM medical_records\n" +
+                "WHERE patient_name = ?";
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, mr.getPatientName());
             ps.executeQuery();
             return true;
         } catch (SQLException e) {

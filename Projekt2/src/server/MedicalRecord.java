@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class MedicalRecord {
+	private int recordId;
 	private String patientName;
 	private String doctorName;
 	private String nurseName;
@@ -11,6 +12,7 @@ public class MedicalRecord {
 	private String disease;
 
 	public MedicalRecord(ResultSet rs) throws SQLException {
+		this.recordId = rs.getInt("record_id");
 		this.patientName = rs.getString("patient_name");
 		this.doctorName = rs.getString("doctor_name");
 		this.nurseName = rs.getString("doctor_name");
@@ -26,7 +28,12 @@ public class MedicalRecord {
 		this.disease = "disease";
 	}
 
-	public String getPatientName() {
+	public int getRecordId(){
+		return recordId;
+	}
+
+
+	public String getPatientName(){
 		return patientName;
 	}
 
