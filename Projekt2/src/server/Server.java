@@ -4,6 +4,8 @@ import java.io.*;
 import java.math.BigInteger;
 import java.net.*;
 import java.security.KeyStore;
+import java.sql.SQLException;
+
 import javax.net.*;
 import javax.net.ssl.*;
 import javax.security.cert.X509Certificate;
@@ -82,7 +84,7 @@ public class Server implements Runnable {
 				while ((clientMsg = in.readLine()) != null) {
 					String rev = new StringBuilder(clientMsg).reverse().toString();
 					System.out.println("received '" + clientMsg + "' from client");
-					System.out.print("sending '" + rev + "' to client...");
+					System.out.println("sending '" + rev + "' to client...");
 					out.println(rev);
 					out.flush();
 					System.out.println("done\n");

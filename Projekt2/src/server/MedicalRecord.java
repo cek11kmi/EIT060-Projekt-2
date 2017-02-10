@@ -18,28 +18,38 @@ public class MedicalRecord {
 		this.disease = rs.getString("disease");
 	}
 	
-	public String getPatientName(){
+	public MedicalRecord(){
+		this.patientName = "patient_name";
+		this.doctorName = "doctor_name";
+		this.nurseName = "doctor_name";
+		this.division = "division";
+		this.disease = "disease";
+	}
+
+	public String getPatientName() {
 		return patientName;
 	}
-	
-	public String getDoctorName(){
+
+	public String getDoctorName() {
 		return doctorName;
 	}
-	
-	public String getNurseName(){
+
+	public String getNurseName() {
 		return nurseName;
 	}
-	
-	public String getDivision(){
+
+	public String getDivision() {
 		return division;
 	}
-	
-	public String getDisease(){
+
+	public String getDisease() {
 		return disease;
 	}
-	
+
 	@Override
 	public String toString() {
-		return "kul";
+		String patient = patientName + "\nDoctor: "
+				+ doctorName + "\nNurse: " + nurseName + "\nDivision: " + division + "\nDisease: " + disease;
+		return patient;
 	}
 }
