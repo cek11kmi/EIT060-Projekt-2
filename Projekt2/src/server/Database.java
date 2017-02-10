@@ -133,6 +133,29 @@ public class Database {
         return "";
     }
     
+    public String getNurseDivision(String serialNbr){
+    	PreparedStatement ps = null;
+    	ResultSet rs = null;
+        try {
+            String sql =
+                "SELECT division\n" +
+                "FROM   nurses\n" +
+                "WHERE  serial_number = ?";
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, serialNbr);
+            rs = ps.executeQuery();
+            if (rs.next()){
+            	return rs.getString("division");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+        	closePs(ps, rs);
+        }
+        return "";
+    }
+    
     public String getDoctorName(String serialNbr){
     	PreparedStatement ps = null;
     	ResultSet rs = null;
@@ -179,7 +202,7 @@ public class Database {
         return "";
     }
     
-    public List<String> getDoctorPatiens(String doctorName) {
+    public List<String> getDoctorPatients(String doctorName) {
     	List<String> patientList = new LinkedList<String>();
     	PreparedStatement ps = null;
     	ResultSet rs = null;
