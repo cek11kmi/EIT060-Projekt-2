@@ -54,7 +54,7 @@ public class Client {
 				SSLContext ctx = SSLContext.getInstance("TLS");
 
 				ts = KeyStore.getInstance("JKS");
-				ts.load(new FileInputStream("../clientassets/clienttruststore"), trustStorePW); // truststore
+				ts.load(new FileInputStream("clientassets/clienttruststore"), trustStorePW); // truststore
 																								// password
 																								// (storepass);
 				tmf.init(ts); // keystore can be used as truststore here

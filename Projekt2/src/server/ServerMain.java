@@ -73,9 +73,9 @@ public class ServerMain {
                 KeyStore ks = KeyStore.getInstance("JKS");
 				KeyStore ts = KeyStore.getInstance("JKS");
                 char[] password = "password".toCharArray();
-
-                ks.load(new FileInputStream("../serverassets/serverkeystore"), password);  // keystore password (storepass)
-                ts.load(new FileInputStream("../serverassets/servertruststore"), password); // truststore password (storepass)
+                
+                ks.load(new FileInputStream("serverassets/serverkeystore"), password);  // keystore password (storepass)
+                ts.load(new FileInputStream("serverassets/servertruststore"), password); // truststore password (storepass)
                 kmf.init(ks, password); // certificate password (keypass)
                 tmf.init(ts);  // possible to use keystore as truststore here
                 ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);

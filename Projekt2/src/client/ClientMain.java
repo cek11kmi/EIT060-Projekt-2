@@ -1,11 +1,14 @@
 package client;
 
-import java.io.*;
-import javax.net.ssl.*;
-import javax.security.cert.X509Certificate;
-
+import java.io.Console;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyStore;
-import java.security.cert.*;
+import java.util.Scanner;
+
+import javax.net.ssl.KeyManagerFactory;
 
 public class ClientMain {
 
@@ -13,10 +16,14 @@ public class ClientMain {
 
 		String host = "";
 		String portString = "";
+		String certName="";
+		char[] ksPW = new char[0];
 		Console cons = System.console();
-		if (args.length == 2) {
+		if (args.length == 4) {
 			host = args[0];
 			portString = args[1];
+			certName = args[2];
+			ksPW = args[3].toCharArray();
 		} else if (cons != null){
 			// Input host and port number
 			System.out.println("Please input the host and port");
@@ -42,13 +49,15 @@ public class ClientMain {
 
 		// input the name of the keystore you want to use, this checks if it
 		// exists
-		boolean fileFound = false;
 		InputStream is = null;
-		while (!fileFound) {
+		boolean fileFound = false;
+		while (!fileFound ) {
+			if(certName.equals("")){
 			System.out.println("Please insert name of certificate you would like to use: ");
-			String certName = cons.readLine();
+			 certName = cons.readLine();
+			}
 			try {
-				is = new FileInputStream("../clientassets/keystores/" + certName);
+				is = new FileInputStream("clientassets/keystores/" + certName);
 				fileFound = true;
 			} catch (FileNotFoundException ex) {
 				System.out.println("File not found! Please try again.");
@@ -56,9 +65,10 @@ public class ClientMain {
 		}
 
 		// password input for the keystore
+		if(ksPW.length==0){
 		System.out.println("Please insert password: ");
-		char[] ksPW = cons.readPassword();
-
+		ksPW = cons.readPassword();
+		}
 		// this loads the keystore with the password provided
 		KeyStore ks;
 		try {
@@ -85,11 +95,13 @@ public class ClientMain {
 		if (!(client.initConnection(kmf, host, port))) {
 			System.out.println("Connection failed!");
 		}
-
+		
 		while (client.isConnected()) {
 			System.out.println("Service selectör");
 			System.out.println("1: Read record \n2: Edit record \n3: Add to record \n4: \n0: Exit");
-			String option = cons.readLine();
+			
+			// Ändra tillbaka till console.in om detta inte funkar i terminalen
+			String option = new Scanner(System.in).nextLine();
 			switch (option) {
 			case "1":
 				client.sendMessage(option);
