@@ -336,9 +336,9 @@ public class Database {
         try {
             String sql =
                 "DELETE FROM medical_records\n" +
-                "WHERE patient_name = ?";
+                "WHERE record_id = ?";
             ps = conn.prepareStatement(sql);
-            ps.setString(1, mr.getPatientName());
+            ps.setInt(1, mr.getRecordId());
             ps.executeQuery();
             return true;
         } catch (SQLException e) {
