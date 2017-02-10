@@ -5,6 +5,8 @@ import java.math.BigInteger;
 import java.net.*;
 import java.security.KeyStore;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.net.*;
 import javax.net.ssl.*;
@@ -101,6 +103,18 @@ public class Server implements Runnable {
 			e.printStackTrace();
 			return;
 		}
+	}
+	
+	private List<MedicalRecord> getReadableRecords(String title, String name, String serialNbr){
+		List<MedicalRecord> recordList = new ArrayList<MedicalRecord>();
+		if(title.equals("patient")){
+			recordList = db.getMedicalRecord(name);
+		} else if( title.equals("doctor")){
+			recordList = db.getMedicalRecordsByDivisionAndDoctor(db.getDoctorDivision(serialNbr), name);
+		} else if(title.equals("nurse")){
+			recordList = db.getMedicalRecordsByDivisionAndNurse(db.getNurseDivision(serialNbr), name);
+		} 
+		return recordList;
 	}
 
 	private void newListener() {
