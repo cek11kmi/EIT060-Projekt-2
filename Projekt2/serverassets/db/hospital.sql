@@ -42,14 +42,14 @@ CREATE TABLE patients(
 
 CREATE TABLE medical_records(
 	record_id int PRIMARY KEY,
-	patient_name TEXT,
-	doctor_name TEXT,
-	nurse_name TEXT,
+	patient_id int,
+	doctor_id int,
+	nurse_id int,
 	division TEXT,
 	disease TEXT,
-	FOREIGN KEY (patient_name) REFERENCES patients(name),
-	FOREIGN KEY (doctor_name) REFERENCES doctors(name),
-	FOREIGN KEY (nurse_name) REFERENCES nurses(name)
+	FOREIGN KEY (patient_id) REFERENCES patients(patient_id),
+	FOREIGN KEY (doctor_id) REFERENCES doctors(doctor_id),
+	FOREIGN KEY (nurse_id) REFERENCES nurses(nurse_id)
 );
 
 
