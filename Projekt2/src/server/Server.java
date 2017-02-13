@@ -53,15 +53,19 @@ public class Server implements Runnable {
 				
 				//retrieves the users name from the database
 				String name = "";
+				int id = 0;
 				switch (title) {
 				case "Patient": 
-					name = db.getPatientName(serialNbrString);  
+					id = db.getPatientId(serialNbrString); 
+					name = db.getPatientName(id);
 					break;
 				case "Nurse":
-					name = db.getNurseName(serialNbrString);
+					id = db.getNurseId(serialNbrString);
+					name = db.getNurseName(id);
 					break;
 				case "Doctor":
-					name = db.getDoctorName(serialNbrString);
+					id = db.getDoctorId(serialNbrString);
+					name = db.getDoctorName(id);
 					break;
 				case "Government":
 					System.out.println("client is government");
@@ -84,12 +88,8 @@ public class Server implements Runnable {
 
 				String clientMsg = null;
 				while ((clientMsg = in.readLine()) != null) {
-					String rev = new StringBuilder(clientMsg).reverse().toString();
-					System.out.println("received '" + clientMsg + "' from client");
-					System.out.println("sending '" + rev + "' to client...");
-					out.println(rev);
-					out.flush();
-					System.out.println("done\n");
+					receivedMsg(in, out, clientMsg, id, title);
+					
 				}
 				in.close();
 				out.close();
@@ -105,15 +105,19 @@ public class Server implements Runnable {
 		}
 	}
 	
-	private List<MedicalRecord> getReadableRecords(String title, String name, String serialNbr){
+	private List<MedicalRecord> getReadableRecords(String title, int id){
+		title = title.toLowerCase();
+		System.out.println(title);
 		List<MedicalRecord> recordList = new ArrayList<MedicalRecord>();
 		if(title.equals("patient")){
-			recordList = db.getMedicalRecord(name);
-		} else if( title.equals("doctor")){
-			recordList = db.getMedicalRecordsByDivisionAndDoctor(db.getDoctorDivision(serialNbr), name);
+			recordList = db.getMedicalRecord(id);
+		} else if(title.equals("doctor")){
+			recordList = db.getMedicalRecordsByDivisionAndDoctor(db.getDoctorDivision(id), id);
 		} else if(title.equals("nurse")){
-			recordList = db.getMedicalRecordsByDivisionAndNurse(db.getNurseDivision(serialNbr), name);
-		} 
+			recordList = db.getMedicalRecordsByDivisionAndNurse(db.getNurseDivision(id), id);
+		}  else if (title.equals("government")){
+			recordList = db.getMedicalRecords();
+		}
 		return recordList;
 	}
 
@@ -138,5 +142,39 @@ public class Server implements Runnable {
 			System.out.println("Error retrieving cerificate serial number");
 			return "";
 		}
+	}
+	
+	private void receivedMsg(BufferedReader in, PrintWriter out, String msg, int id, String title){
+		switch (msg) {
+		case "1":
+			printRecords(out, id, title);
+			break;
+		case "2":
+			addRecord(in, out, id, title);
+			break;
+		} 
+		
+
+
+	}
+	
+	private void printRecords(PrintWriter out, int id, String title){
+		List<MedicalRecord> recordList = getReadableRecords(title, id);
+		out.println(title + " " + id);
+		for (MedicalRecord mr : recordList){
+			out.println("Id: " + mr.getRecordId() + " Namn: " + db.getPatientName(mr.getPatientId()));
+			out.flush();
+		}
+	}
+	
+	private void addRecord(BufferedReader in, PrintWriter out, int id, String title){
+		String patientId = "";
+		out.println("Patient id: ");
+		try {
+			patientId = in.readLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println("Patient id is " + patientId + " Patient name is " + db.getPatientName(Integer.parseInt(patientId)));
 	}
 }

@@ -95,31 +95,10 @@ public class ClientMain {
 		if (!(client.initConnection(kmf, host, port))) {
 			System.out.println("Connection failed!");
 		}
-		
-		while (client.isConnected()) {
-			System.out.println("Service selectör");
-			System.out.println("1: Read record \n2: Edit record \n3: Add to record \n4: \n0: Exit");
-			
-			// Ändra tillbaka till console.in om detta inte funkar i terminalen
-			String option = new Scanner(System.in).nextLine();
-			switch (option) {
-			case "1":
-				client.sendMessage(option);
-				break;
-			case "2":
-				client.sendMessage(option);
-				break;
-			case "3":
-				client.sendMessage(option);
-				break;
-			case "0":
-				System.exit(0);
-				break;
-			default:
-				System.out.println("No such option.\n");
-				break;
-			}
-		}
+		client.printMenu();
+//		while (client.isConnected()) {
+//			
+//		}
 	}
 
 }

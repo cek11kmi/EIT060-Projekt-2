@@ -87,19 +87,19 @@ public class Database {
         return "";
     }
     
-    public String getPatientName(String serialNbr){
+    public int getPatientId(String serialNbr){
     	PreparedStatement ps = null;
     	ResultSet rs = null;
         try {
             String sql =
-                "SELECT name\n" +
+                "SELECT patient_id\n" +
                 "FROM   patients\n" +
                 "WHERE  serial_number = ?";
             ps = conn.prepareStatement(sql);
             ps.setString(1, serialNbr);
             rs = ps.executeQuery();
             if (rs.next()){
-            	return rs.getString("name");
+            	return rs.getInt("patient_id");
             }
 
         } catch (SQLException e) {
@@ -107,22 +107,22 @@ public class Database {
         } finally {
         	closePs(ps, rs);
         }
-        return "";
+        return 0;
     }
     
-    public String getNurseName(String serialNbr){
+    public int getNurseId(String serialNbr){
     	PreparedStatement ps = null;
     	ResultSet rs = null;
         try {
             String sql =
-                "SELECT name\n" +
+                "SELECT nurse_id\n" +
                 "FROM   nurses\n" +
                 "WHERE  serial_number = ?";
             ps = conn.prepareStatement(sql);
             ps.setString(1, serialNbr);
             rs = ps.executeQuery();
             if (rs.next()){
-            	return rs.getString("name");
+            	return rs.getInt("nurse_id");
             }
 
         } catch (SQLException e) {
@@ -130,19 +130,19 @@ public class Database {
         } finally {
         	closePs(ps, rs);
         }
-        return "";
+        return 0;
     }
     
-    public String getNurseDivision(String serialNbr){
+    public String getNurseDivision(int nurseId){
     	PreparedStatement ps = null;
     	ResultSet rs = null;
         try {
             String sql =
                 "SELECT division\n" +
                 "FROM   nurses\n" +
-                "WHERE  serial_number = ?";
+                "WHERE  nurse_id = ?";
             ps = conn.prepareStatement(sql);
-            ps.setString(1, serialNbr);
+            ps.setInt(1, nurseId);
             rs = ps.executeQuery();
             if (rs.next()){
             	return rs.getString("division");
@@ -156,19 +156,19 @@ public class Database {
         return "";
     }
     
-    public String getDoctorName(String serialNbr){
+    public int getDoctorId(String serialNbr){
     	PreparedStatement ps = null;
     	ResultSet rs = null;
         try {
             String sql =
-                "SELECT name\n" +
+                "SELECT doctor_id\n" +
                 "FROM   doctors\n" +
                 "WHERE  serial_number = ?";
             ps = conn.prepareStatement(sql);
             ps.setString(1, serialNbr);
             rs = ps.executeQuery();
             if (rs.next()){
-            	return rs.getString("name");
+            	return rs.getInt("doctor_id");
             }
 
         } catch (SQLException e) {
@@ -176,19 +176,19 @@ public class Database {
         } finally {
         	closePs(ps, rs);
         }
-        return "";
+        return 0;
     }
    
-    public String getDoctorDivision(String serialNbr) {
+    public String getDoctorDivision(int doctorId) {
     	PreparedStatement ps = null;
     	ResultSet rs = null;
         try {
             String sql =
                 "SELECT division\n" +
                 "FROM   doctors\n" +
-                "WHERE  serial_number = ?";
+                "WHERE  doctor_id = ?";
             ps = conn.prepareStatement(sql);
-            ps.setString(1, serialNbr);
+            ps.setInt(1, doctorId);
             rs = ps.executeQuery();
             if (rs.next()){
             	return rs.getString("division");
@@ -202,20 +202,20 @@ public class Database {
         return "";
     }
     
-    public List<String> getDoctorPatients(String doctorName) {
-    	List<String> patientList = new LinkedList<String>();
+    public List<Integer> getDoctorPatients(int doctorId) {
+    	List<Integer> patientList = new LinkedList<Integer>();
     	PreparedStatement ps = null;
     	ResultSet rs = null;
         try {
             String sql =
-                "SELECT name\n" +
-                "FROM   doctors\n" +
-                "WHERE  doctor_name = ?";
+                "SELECT patient_id\n" +
+                "FROM   patients\n" +
+                "WHERE  doctor_id = ?";
             ps = conn.prepareStatement(sql);
-            ps.setString(1, doctorName);
+            ps.setInt(1, doctorId);
             rs = ps.executeQuery();
             while (rs.next()){
-            	patientList.add(rs.getString("name"));
+            	patientList.add(rs.getInt("patient_id"));
             }
 
         } catch (SQLException e) {
@@ -226,7 +226,7 @@ public class Database {
         return patientList;
     }
     
-    public List<MedicalRecord> getMedicalRecord(String patientName){
+    public List<MedicalRecord> getMedicalRecord(int patientId){
     	List<MedicalRecord> recordsList = new LinkedList<MedicalRecord>();
     	PreparedStatement ps = null;
     	ResultSet rs = null;
@@ -236,7 +236,7 @@ public class Database {
                 "FROM   medical_records\n" +
                 "WHERE  doctor_name = ?";
             ps = conn.prepareStatement(sql);
-            ps.setString(1, patientName);
+            ps.setInt(1, patientId);
             rs = ps.executeQuery();
             while (rs.next()){
             	recordsList.add(new MedicalRecord(rs));
@@ -274,7 +274,7 @@ public class Database {
         return recordsList;
     }
     
-    public List<MedicalRecord> getMedicalRecordsByDivisionAndDoctor(String division, String doctorName){
+    public List<MedicalRecord> getMedicalRecordsByDivisionAndDoctor(String division, int doctorId){
     	List<MedicalRecord> recordsList = new LinkedList<MedicalRecord>();
     	PreparedStatement ps = null;
     	ResultSet rs = null;
@@ -286,10 +286,10 @@ public class Database {
                 "UNION \n" +
                 "SELECT *\n" +
                 "FROM medical_records\n" +
-                "WHERE doctor_name = ?";
+                "WHERE doctor_id = ?";
             ps = conn.prepareStatement(sql);
             ps.setString(1, division);
-            ps.setString(2, doctorName);
+            ps.setInt(2, doctorId);
             rs = ps.executeQuery();
             while (rs.next()){
             	recordsList.add(new MedicalRecord(rs));
@@ -302,7 +302,7 @@ public class Database {
         return recordsList;
     }
     
-    public List<MedicalRecord> getMedicalRecordsByDivisionAndNurse(String division, String nurseName){
+    public List<MedicalRecord> getMedicalRecordsByDivisionAndNurse(String division, int nurseId){
     	List<MedicalRecord> recordsList = new LinkedList<MedicalRecord>();
     	PreparedStatement ps = null;
     	ResultSet rs = null;
@@ -314,10 +314,10 @@ public class Database {
                 "UNION \n" +
                 "SELECT *\n" +
                 "FROM medical_records\n" +
-                "WHERE nurse_name = ?";
+                "WHERE nurse_id = ?";
             ps = conn.prepareStatement(sql);
             ps.setString(1, division);
-            ps.setString(2, nurseName);
+            ps.setInt(2, nurseId);
             rs = ps.executeQuery();
             while (rs.next()){
             	recordsList.add(new MedicalRecord(rs));
@@ -328,6 +328,96 @@ public class Database {
         	closePs(ps, rs);
         }
         return recordsList;
+    }
+    
+    public List<MedicalRecord> getMedicalRecords(){
+    	List<MedicalRecord> recordsList = new LinkedList<MedicalRecord>();
+    	PreparedStatement ps = null;
+    	ResultSet rs = null;
+        try {
+            String sql =
+                "SELECT *\n" +
+                "FROM   medical_records";
+            ps = conn.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()){
+            	recordsList.add(new MedicalRecord(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+        	closePs(ps, rs);
+        }
+        return recordsList;
+    }
+    
+    public String getNurseName(int nurseId){
+    	PreparedStatement ps = null;
+    	ResultSet rs = null;
+        try {
+            String sql =
+                "SELECT name\n" +
+                "FROM   nurses\n" +
+                "WHERE  nurse_id = ?";
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, nurseId);
+            rs = ps.executeQuery();
+            if (rs.next()){
+            	return rs.getString("name");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+        	closePs(ps, rs);
+        }
+        return "";
+    }
+    
+    public String getPatientName(int patientId){
+    	PreparedStatement ps = null;
+    	ResultSet rs = null;
+        try {
+            String sql =
+                "SELECT name\n" +
+                "FROM   patients\n" +
+                "WHERE  patient_id = ?";
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, patientId);
+            rs = ps.executeQuery();
+            if (rs.next()){
+            	return rs.getString("name");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+        	closePs(ps, rs);
+        }
+        return "";
+    }
+    
+    public String getDoctorName(int doctorId){
+    	PreparedStatement ps = null;
+    	ResultSet rs = null;
+        try {
+            String sql =
+                "SELECT name\n" +
+                "FROM   doctors\n" +
+                "WHERE  doctor_id = ?";
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, doctorId);
+            rs = ps.executeQuery();
+            if (rs.next()){
+            	return rs.getString("name");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+        	closePs(ps, rs);
+        }
+        return "";
     }
     
     public boolean addMedicalRecord(MedicalRecord mr){
@@ -335,14 +425,39 @@ public class Database {
     	ResultSet rs = null;
         try {
             String sql =
-                "INSERT INTO medical_records(patient_name, doctor_name, nurse_name, division, disease)\n" +
+                "INSERT INTO medical_records(patient_id, doctor_id, nurse_id, division, disease)\n" +
                 "VALUES(?,?,?,?,?)";
             ps = conn.prepareStatement(sql);
-            ps.setString(1, mr.getPatientName());
-            ps.setString(2, mr.getDoctorName());
-            ps.setString(3, mr.getNurseName());
+            ps.setInt(1, mr.getPatientId());
+            ps.setInt(2, mr.getDoctorId());
+            ps.setInt(3, mr.getNurseId());
             ps.setString(4, mr.getDivision());
             ps.setString(5, mr.getDisease());
+            ps.executeQuery();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+        	closePs(ps, rs);
+        }
+    }
+    
+    public boolean updateMedicalRecord(MedicalRecord mr){
+    	PreparedStatement ps = null;
+    	ResultSet rs = null;
+        try {
+            String sql =
+            	"UPDATE medical_records\n" +
+            	"SET nurse_id = ?\n" + 
+            	"SET division = ?\n" +
+                "SET disease = ?\n" +
+                "WHERE record_id = ?";
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, mr.getNurseId());
+            ps.setString(2, mr.getDivision());
+            ps.setString(3, mr.getDisease());
+            ps.setInt(4, mr.getRecordId());
             ps.executeQuery();
             return true;
         } catch (SQLException e) {

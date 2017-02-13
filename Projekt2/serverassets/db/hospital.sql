@@ -1,10 +1,11 @@
 
-
+PRAGMA foreign_keys = off;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS nurses;
 DROP TABLE IF EXISTS doctors;
 DROP TABLE IF EXISTS patients;
 DROP TABLE IF EXISTS medical_records;
+PRAGMA foreign_keys = on;
 
 
 
@@ -14,7 +15,7 @@ CREATE TABLE users(
 );
 
 CREATE TABLE nurses(
-	nurse_id int PRIMARY KEY,
+	nurse_id Integer PRIMARY KEY,
 	serial_number TEXT,
 	name TEXT NOT NULL,
 	division TEXT NOT NULL,
@@ -22,7 +23,7 @@ CREATE TABLE nurses(
 );
 
 CREATE TABLE doctors(
-	doctor_id int PRIMARY KEY,
+	doctor_id Integer PRIMARY KEY,
 	serial_number TEXT,
 	name TEXT NOT NULL,
 	division TEXT NOT NULL,
@@ -31,17 +32,17 @@ CREATE TABLE doctors(
 
 
 CREATE TABLE patients(
-	patient_id int PRIMARY KEY,
+	patient_id Integer PRIMARY KEY,
 	serial_number TEXT,
-	doctor_name TEXT NOT NULL,
+	doctor_id int,
 	name TEXT NOT NULL,
 	FOREIGN KEY (serial_number) REFERENCES users(serial_number),
-	FOREIGN KEY (doctor_name) REFERENCES doctors(name)
+	FOREIGN KEY (doctor_id) REFERENCES doctors(doctor_id)
 );
 	
 
 CREATE TABLE medical_records(
-	record_id int PRIMARY KEY,
+	record_id Integer PRIMARY KEY,
 	patient_id int,
 	doctor_id int,
 	nurse_id int,
@@ -74,11 +75,11 @@ VALUES	('10962565134263569950', 'Berit', 'Hypokondri'),
 	('10962565134263569951', 'Peter', 'Hypokondri'),
 	('10962565134263569952', 'Johanna', 'Autokrati');
 
-INSERT INTO patients(serial_number, doctor_name, name) 
-VALUES ('10962565134263569946', 'Oskar', 'Olle'),
-	('10962565134263569947', 'Ingrid', 'Karin'),
-	('10962565134263569948', 'Oskar', 'Robert'),
-	('10962565134263569949', 'Ingrid', 'Dennis');
+INSERT INTO patients(serial_number, doctor_id, name) 
+VALUES ('10962565134263569946', '1', 'Olle'),
+	('10962565134263569947', '2', 'Karin'),
+	('10962565134263569948', '1', 'Robert'),
+	('10962565134263569949', '2', 'Dennis');
 	
 	
 

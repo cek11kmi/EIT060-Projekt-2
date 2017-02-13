@@ -42,7 +42,6 @@ public class Client {
 
 		out.println(msg);
 		out.flush();
-
 	}
 
 	public boolean initConnection(KeyManagerFactory kmf, String host, int port) {
@@ -108,6 +107,38 @@ public class Client {
 			e.printStackTrace();
 		}
 		connected = false;
+	}
+
+	public void printMenu() {
+		System.out.println("Service selector");
+		System.out.println("1: List records \n2: Create new record  \n0: Exit");
+
+		// Ändra tillbaka till console.in om detta inte funkar i terminalen
+		String option = new Scanner(System.in).nextLine();
+		switch (option) {
+		case "1":
+			try {
+				sendMessage(option);
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			break;
+		case "2":
+			try {
+				sendMessage(option);
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			break;
+		case "0":
+			System.exit(0);
+			break;
+		default:
+			System.out.println("No such option.\n");
+			break;
+		}
 	}
 }
 

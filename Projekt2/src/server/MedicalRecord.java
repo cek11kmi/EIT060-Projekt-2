@@ -5,25 +5,25 @@ import java.sql.SQLException;
 
 public class MedicalRecord {
 	private int recordId;
-	private String patientName;
-	private String doctorName;
-	private String nurseName;
+	private int patientId;
+	private int doctorId;
+	private int nurseId;
 	private String division;
 	private String disease;
 
 	public MedicalRecord(ResultSet rs) throws SQLException {
 		this.recordId = rs.getInt("record_id");
-		this.patientName = rs.getString("patient_name");
-		this.doctorName = rs.getString("doctor_name");
-		this.nurseName = rs.getString("doctor_name");
+		this.patientId = rs.getInt("patient_id");
+		this.doctorId = rs.getInt("doctor_id");
+		this.nurseId = rs.getInt("doctor_id");
 		this.division = rs.getString("division");
 		this.disease = rs.getString("disease");
 	}
 	
 	public MedicalRecord(){
-		this.patientName = "patient_name";
-		this.doctorName = "doctor_name";
-		this.nurseName = "doctor_name";
+		this.patientId = 1;
+		this.doctorId = 1;
+		this.nurseId = 1;
 		this.division = "division";
 		this.disease = "disease";
 	}
@@ -32,17 +32,16 @@ public class MedicalRecord {
 		return recordId;
 	}
 
-
-	public String getPatientName(){
-		return patientName;
+	public int getPatientId(){
+		return patientId;
 	}
 
-	public String getDoctorName() {
-		return doctorName;
+	public int getDoctorId() {
+		return doctorId;
 	}
 
-	public String getNurseName() {
-		return nurseName;
+	public int getNurseId() {
+		return nurseId;
 	}
 
 	public String getDivision() {
@@ -52,11 +51,23 @@ public class MedicalRecord {
 	public String getDisease() {
 		return disease;
 	}
-
+	
+	public void setNurseId(int nurseId){
+		this.nurseId = nurseId;
+	}
+	
+	public void setDivision(String division){
+		this.division = division;
+	}
+	
+	public void setDisease(String disease){
+		this.disease = disease;
+	}
+	
 	@Override
 	public String toString() {
-		String patient = patientName + "\nDoctor: "
-				+ doctorName + "\nNurse: " + nurseName + "\nDivision: " + division + "\nDisease: " + disease;
+		String patient = patientId + "\nDoctor: "
+				+ doctorId + "\nNurse: " + nurseId + "\nDivision: " + division + "\nDisease: " + disease;
 		return patient;
 	}
 }

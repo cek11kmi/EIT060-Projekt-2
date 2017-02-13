@@ -20,7 +20,7 @@ public class Main {
 
 		} else {
 			port = "9871";
-			String[] start = { "localhost", port, "nurse_1_keystore", "password" };
+			String[] start = { "localhost", port, "doctor_1_keystore", "password" };
 			String[] smS = { port };
 			ServerMain.main(smS);
 			ClientMain.main(start);
