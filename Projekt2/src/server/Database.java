@@ -426,14 +426,14 @@ public class Database {
         try {
             String sql =
                 "INSERT INTO medical_records(patient_id, doctor_id, nurse_id, division, disease)\n" +
-                "VALUES(?,?,?,?,?)";
+                "VALUES(?,?,?,?,?);";
             ps = conn.prepareStatement(sql);
             ps.setInt(1, mr.getPatientId());
             ps.setInt(2, mr.getDoctorId());
             ps.setInt(3, mr.getNurseId());
             ps.setString(4, mr.getDivision());
             ps.setString(5, mr.getDisease());
-            ps.executeQuery();
+            ps.executeUpdate();
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -458,7 +458,7 @@ public class Database {
             ps.setString(2, mr.getDivision());
             ps.setString(3, mr.getDisease());
             ps.setInt(4, mr.getRecordId());
-            ps.executeQuery();
+            ps.executeUpdate();
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -477,7 +477,7 @@ public class Database {
                 "WHERE record_id = ?";
             ps = conn.prepareStatement(sql);
             ps.setInt(1, mr.getRecordId());
-            ps.executeQuery();
+            ps.executeUpdate();
             return true;
         } catch (SQLException e) {
             e.printStackTrace();

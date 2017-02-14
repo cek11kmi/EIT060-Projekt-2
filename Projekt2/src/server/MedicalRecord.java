@@ -20,6 +20,13 @@ public class MedicalRecord {
 		this.disease = rs.getString("disease");
 	}
 	
+	public MedicalRecord(String patientId, String doctorId, String nurseId, String division, String disease){
+		this.patientId = Integer.parseInt(patientId);
+		this.doctorId = Integer.parseInt(doctorId);
+		this.nurseId = Integer.parseInt(nurseId);
+		this.division = division;
+		this.disease = disease;
+	}
 	public MedicalRecord(){
 		this.patientId = 1;
 		this.doctorId = 1;
@@ -66,8 +73,8 @@ public class MedicalRecord {
 	
 	@Override
 	public String toString() {
-		String patient = patientId + "\nDoctor: "
-				+ doctorId + "\nNurse: " + nurseId + "\nDivision: " + division + "\nDisease: " + disease;
+		String patient = ("Patient: " + patientId + "\nDoctor: "
+				+ doctorId + "\nNurse: " + nurseId + "\nDivision: " + division + "\nDisease: " + disease);
 		return patient;
 	}
 }

@@ -26,6 +26,7 @@ public class Client {
 	private String port;
 	private boolean connected;
 	private SSLSocket socket;
+	private BufferedReader in;
 
 	public Client() {
 		trustStorePW = "password".toCharArray();
@@ -33,15 +34,19 @@ public class Client {
 	}
 
 	public void sendMessage(String message) throws IOException {
-		BufferedReader read = new BufferedReader(new InputStreamReader(System.in));
-		PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-		BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		String msg;
+		if (!message.equals("0")) {
+			BufferedReader read = new BufferedReader(new InputStreamReader(System.in));
+			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			String msg;
 
-		msg = message;
+			msg = message;
 
-		out.println(msg);
-		out.flush();
+			out.println(msg);
+			out.flush();
+		} else {
+			printMenu();
+		}
 	}
 
 	public boolean initConnection(KeyManagerFactory kmf, String host, int port) {
@@ -119,7 +124,6 @@ public class Client {
 		case "1":
 			try {
 				sendMessage(option);
-				
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -127,7 +131,6 @@ public class Client {
 		case "2":
 			try {
 				sendMessage(option);
-				
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -138,6 +141,22 @@ public class Client {
 		default:
 			System.out.println("No such option.\n");
 			break;
+		}
+	}
+
+	public void receiveMessage() {
+		try {
+			String message = in.readLine();
+			if(message != null){
+				System.out.println(message);
+			}
+			Scanner s = new Scanner(System.in);
+			if (s.hasNext()){
+				String option = s.nextLine();
+				sendMessage(option);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 }

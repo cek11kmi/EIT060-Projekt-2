@@ -96,9 +96,9 @@ public class ClientMain {
 			System.out.println("Connection failed!");
 		}
 		client.printMenu();
-//		while (client.isConnected()) {
-//			
-//		}
+		while (client.isConnected()) {
+			client.receiveMessage();
+		}
 	}
 
 }

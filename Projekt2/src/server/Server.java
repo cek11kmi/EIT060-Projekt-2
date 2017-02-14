@@ -16,7 +16,6 @@ public class Server implements Runnable {
 	private ServerSocket serverSocket = null;
 	private static int numConnectedClients = 0;
 	private Database db;
-	
 
 	public Server(ServerSocket ss, Database db) throws IOException {
 		serverSocket = ss;
@@ -34,29 +33,28 @@ public class Server implements Runnable {
 			X509Certificate cert = (X509Certificate) session.getPeerCertificateChain()[0];
 			String subject = cert.getSubjectDN().getName();
 			numConnectedClients++;
-			
+
 			System.out.println("client connected");
 			String serialNbrString = cert.getSerialNumber().toString();
-			
-			//Authenticates the client by comparing certificate 
-			//serial number with entries in database
-			//if title is not an empty string the user exists in the database
+
+			// Authenticates the client by comparing certificate
+			// serial number with entries in database
+			// if title is not an empty string the user exists in the database
 			String title = authentication(serialNbrString);
-			
-			
+
 			if (title.equals("")) {
 				System.out.println("client not authenticated");
 			} else {
-				
-				System.out.println("client authenticated");	
+
+				System.out.println("client authenticated");
 				System.out.println("client title is " + title);
-				
-				//retrieves the users name from the database
+
+				// retrieves the users name from the database
 				String name = "";
 				int id = 0;
 				switch (title) {
-				case "Patient": 
-					id = db.getPatientId(serialNbrString); 
+				case "Patient":
+					id = db.getPatientId(serialNbrString);
 					name = db.getPatientName(id);
 					break;
 				case "Nurse":
@@ -70,7 +68,7 @@ public class Server implements Runnable {
 				case "Government":
 					System.out.println("client is government");
 				}
-				if (!name.equals("")){
+				if (!name.equals("")) {
 					System.out.println("client name is " + name);
 				}
 
@@ -89,7 +87,7 @@ public class Server implements Runnable {
 				String clientMsg = null;
 				while ((clientMsg = in.readLine()) != null) {
 					receivedMsg(in, out, clientMsg, id, title);
-					
+
 				}
 				in.close();
 				out.close();
@@ -104,18 +102,17 @@ public class Server implements Runnable {
 			return;
 		}
 	}
-	
-	private List<MedicalRecord> getReadableRecords(String title, int id){
+
+	private List<MedicalRecord> getReadableRecords(String title, int id) {
 		title = title.toLowerCase();
-		System.out.println(title);
 		List<MedicalRecord> recordList = new ArrayList<MedicalRecord>();
-		if(title.equals("patient")){
+		if (title.equals("patient")) {
 			recordList = db.getMedicalRecord(id);
-		} else if(title.equals("doctor")){
+		} else if (title.equals("doctor")) {
 			recordList = db.getMedicalRecordsByDivisionAndDoctor(db.getDoctorDivision(id), id);
-		} else if(title.equals("nurse")){
+		} else if (title.equals("nurse")) {
 			recordList = db.getMedicalRecordsByDivisionAndNurse(db.getNurseDivision(id), id);
-		}  else if (title.equals("government")){
+		} else if (title.equals("government")) {
 			recordList = db.getMedicalRecords();
 		}
 		return recordList;
@@ -143,38 +140,55 @@ public class Server implements Runnable {
 			return "";
 		}
 	}
-	
-	private void receivedMsg(BufferedReader in, PrintWriter out, String msg, int id, String title){
+
+	private void receivedMsg(BufferedReader in, PrintWriter out, String msg, int id, String title) {
 		switch (msg) {
 		case "1":
+
 			printRecords(out, id, title);
+			
 			break;
 		case "2":
 			addRecord(in, out, id, title);
 			break;
-		} 
-		
-
+		}
 
 	}
-	
-	private void printRecords(PrintWriter out, int id, String title){
+
+	private void printRecords(PrintWriter out, int id, String title) {
 		List<MedicalRecord> recordList = getReadableRecords(title, id);
-		out.println(title + " " + id);
-		for (MedicalRecord mr : recordList){
-			out.println("Id: " + mr.getRecordId() + " Namn: " + db.getPatientName(mr.getPatientId()));
+		out.println("The records you can read are");
+		for (MedicalRecord mr : recordList) {
+			out.println("Patient id: " + mr.getRecordId() + " Name: " + db.getPatientName(mr.getPatientId()));
 			out.flush();
 		}
 	}
-	
-	private void addRecord(BufferedReader in, PrintWriter out, int id, String title){
+
+	private void addRecord(BufferedReader in, PrintWriter out, int id, String title) {
 		String patientId = "";
-		out.println("Patient id: ");
+		String doctorId = "";
+		String nurseId = "";
+		String division = "";
+		String disease = "";
+		out.println("Write 0 to return to menu");
 		try {
+			out.println("Patient id: ");
 			patientId = in.readLine();
+			out.println("Doctor id: ");
+			doctorId = in.readLine();
+			out.println("Nurse id: ");
+			nurseId = in.readLine();
+			out.println("Division: ");
+			division = in.readLine();
+			out.println("Disease: ");
+			disease = in.readLine();		
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Patient id is " + patientId + " Patient name is " + db.getPatientName(Integer.parseInt(patientId)));
+		MedicalRecord mr = new MedicalRecord(patientId, doctorId, nurseId, division, disease);
+		if (db.addMedicalRecord(mr)){
+			out.println("Record was added with info " + mr.toString());
+		}
+		
 	}
 }
