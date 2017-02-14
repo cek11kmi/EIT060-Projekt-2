@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.net.ServerSocket;
 import java.security.KeyStore;
+import java.sql.SQLException;
 
 import javax.net.ServerSocketFactory;
 import javax.net.ssl.KeyManagerFactory;
@@ -16,7 +17,7 @@ import javax.net.ssl.TrustManagerFactory;
 
 public class ServerMain {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws SQLException {
 		String portString = "9853";
 		Console cons = System.console();
 		if (args.length == 1) {
@@ -40,7 +41,7 @@ public class ServerMain {
 
 	}
 
-	private void startUp(String portString, Database db) {
+	private void startUp(String portString, Database db) throws SQLException {
 		// this will convert string port to int
 		int port;
 		try {

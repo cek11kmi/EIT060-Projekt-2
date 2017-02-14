@@ -137,16 +137,14 @@ public class Client {
 	}
 
 	public void sendMessage(String message) throws IOException {
-		if (!message.equals("0")) {
+
 			BufferedReader read = new BufferedReader(new InputStreamReader(System.in));
 			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
 			out.println(message);
 			out.flush();
-		} else {
-			printMenu();
-		}
+		
 	}
 	
 	private void sendMessage() throws IOException{
@@ -166,6 +164,8 @@ public class Client {
 				sendMessage();
 			} else if(message.equals("plsinput")){
 				sendMessage();
+			} else if (message.equals("plsmenu")){
+				printMenu();
 			}
 				else {
 				System.out.println(message);

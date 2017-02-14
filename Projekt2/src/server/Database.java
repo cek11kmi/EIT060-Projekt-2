@@ -226,20 +226,19 @@ public class Database {
         return patientList;
     }
     
-    public List<MedicalRecord> getMedicalRecord(int patientId){
-    	List<MedicalRecord> recordsList = new LinkedList<MedicalRecord>();
+    public MedicalRecord getMedicalRecord(int recordId){
     	PreparedStatement ps = null;
     	ResultSet rs = null;
         try {
             String sql =
                 "SELECT *\n" +
                 "FROM   medical_records\n" +
-                "WHERE  doctor_name = ?";
+                "WHERE  record_id = ?";
             ps = conn.prepareStatement(sql);
-            ps.setInt(1, patientId);
+            ps.setInt(1, recordId);
             rs = ps.executeQuery();
-            while (rs.next()){
-            	recordsList.add(new MedicalRecord(rs));
+            if (rs.next()){
+            	return new MedicalRecord(rs);
             }
 
         } catch (SQLException e) {
@@ -247,7 +246,7 @@ public class Database {
         } finally {
         	closePs(ps, rs);
         }
-        return recordsList;
+        return null;
     }
     
     public List<MedicalRecord> getMedicalRecordsByDivision(String division){
@@ -420,10 +419,9 @@ public class Database {
         return "";
     }
     
-    public boolean addMedicalRecord(MedicalRecord mr){
+    public void addMedicalRecord(MedicalRecord mr) throws SQLException{
     	PreparedStatement ps = null;
     	ResultSet rs = null;
-        try {
             String sql =
                 "INSERT INTO medical_records(patient_id, doctor_id, nurse_id, division, disease)\n" +
                 "VALUES(?,?,?,?,?);";
@@ -434,13 +432,7 @@ public class Database {
             ps.setString(4, mr.getDivision());
             ps.setString(5, mr.getDisease());
             ps.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        } finally {
         	closePs(ps, rs);
-        }
     }
     
     public boolean updateMedicalRecord(MedicalRecord mr){
@@ -484,6 +476,22 @@ public class Database {
             return false;
         } finally {
         	closePs(ps, rs);
+        }
+    }
+    
+    public void foreignKey() throws SQLException{
+    	PreparedStatement ps = null;
+        try {
+            String sql =
+                "PRAGMA foreign_keys = on";
+            ps = conn.prepareStatement(sql);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+        	if (ps != null){
+				ps.close();
+			}
         }
     }
     

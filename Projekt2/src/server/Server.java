@@ -12,12 +12,14 @@ import javax.net.*;
 import javax.net.ssl.*;
 import javax.security.cert.X509Certificate;
 
+import org.sqlite.SQLiteException;
+
 public class Server implements Runnable {
 	private ServerSocket serverSocket = null;
 	private static int numConnectedClients = 0;
 	private Database db;
 
-	public Server(ServerSocket ss, Database db) throws IOException {
+	public Server(ServerSocket ss, Database db) throws IOException, SQLException {
 		serverSocket = ss;
 		this.db = db;
 		startDb();
@@ -106,7 +108,7 @@ public class Server implements Runnable {
 		title = title.toLowerCase();
 		List<MedicalRecord> recordList = new ArrayList<MedicalRecord>();
 		if (title.equals("patient")) {
-			recordList = db.getMedicalRecord(id);
+			//recordList = db.getMedicalRecord(id);
 		} else if (title.equals("doctor")) {
 			recordList = db.getMedicalRecordsByDivisionAndDoctor(db.getDoctorDivision(id), id);
 		} else if (title.equals("nurse")) {
@@ -121,9 +123,10 @@ public class Server implements Runnable {
 		(new Thread(this)).start();
 	} // calls run()
 
-	private void startDb() {
+	private void startDb() throws SQLException {
 		if (db.openConnection("serverassets/db/hospital.db")) {
 			System.out.println("Database connected");
+			db.foreignKey();
 		} else {
 			System.out.println("Database not connected");
 			System.exit(0);
@@ -140,13 +143,23 @@ public class Server implements Runnable {
 		}
 	}
 
-	private void receivedMsg(BufferedReader in, PrintWriter out, String msg, int id, String title) {
+	private void receivedMsg(BufferedReader in, PrintWriter out, String msg, int id, String title) throws IOException {
 		switch (msg) {
 		case "menu1":
 			printRecords(out, id, title);
+			out.println("Välj ID som du vill läsa");
+			out.println("done");
+			String recordId = in.readLine();
+			MedicalRecord mr = db.getMedicalRecord(Integer.parseInt(recordId));
+			out.println(mr.toString());
+		
+			out.println("Skicka 0 för att gå tillbaka");
+			out.println("done");
 			break;
 		case "menu2":
 			addRecord(in, out, id, title);
+			break;
+		default:
 			break;
 		}
 	}
@@ -159,7 +172,7 @@ public class Server implements Runnable {
 			out.println("Record id: " + mr.getRecordId() + " Name: " + db.getPatientName(mr.getPatientId()));	
 		}
 		//sends done to let client know its done
-		out.println("done");
+	
 		out.flush();
 	}
 
@@ -169,7 +182,6 @@ public class Server implements Runnable {
 		String nurseId = "";
 		String division = "";
 		String disease = "";
-		out.println("Write 0 to return to menu");
 		try {
 			out.println("Patient id: ");
 			out.println("plsinput");
@@ -189,10 +201,15 @@ public class Server implements Runnable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		MedicalRecord mr = new MedicalRecord(patientId, doctorId, nurseId, division, disease);
-		if (db.addMedicalRecord(mr)){
-			out.println("Record was added with info " + mr.toString());
-			out.println("done");
+			MedicalRecord mr = new MedicalRecord(patientId, doctorId, nurseId, division, disease);
+			try {
+				db.addMedicalRecord(mr);
+				out.println("Record was added with info " + mr.toString());
+				out.println("done");
+			}
+			catch (SQLException e){
+			out.println("Wrong indate");
+			out.println("plsmenu");
 		}
 		
 	}
