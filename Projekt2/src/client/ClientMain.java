@@ -97,6 +97,7 @@ public class ClientMain {
 		}
 		client.printMenu();
 		while (client.isConnected()) {
+			
 			client.receiveMessage();
 		}
 	}

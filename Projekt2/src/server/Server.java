@@ -87,7 +87,6 @@ public class Server implements Runnable {
 				String clientMsg = null;
 				while ((clientMsg = in.readLine()) != null) {
 					receivedMsg(in, out, clientMsg, id, title);
-
 				}
 				in.close();
 				out.close();
@@ -143,25 +142,25 @@ public class Server implements Runnable {
 
 	private void receivedMsg(BufferedReader in, PrintWriter out, String msg, int id, String title) {
 		switch (msg) {
-		case "1":
-
+		case "menu1":
 			printRecords(out, id, title);
-			
 			break;
-		case "2":
+		case "menu2":
 			addRecord(in, out, id, title);
 			break;
 		}
-
 	}
+	
 
 	private void printRecords(PrintWriter out, int id, String title) {
 		List<MedicalRecord> recordList = getReadableRecords(title, id);
 		out.println("The records you can read are");
 		for (MedicalRecord mr : recordList) {
-			out.println("Patient id: " + mr.getRecordId() + " Name: " + db.getPatientName(mr.getPatientId()));
-			out.flush();
+			out.println("Record id: " + mr.getRecordId() + " Name: " + db.getPatientName(mr.getPatientId()));	
 		}
+		//sends done to let client know its done
+		out.println("done");
+		out.flush();
 	}
 
 	private void addRecord(BufferedReader in, PrintWriter out, int id, String title) {
@@ -173,14 +172,19 @@ public class Server implements Runnable {
 		out.println("Write 0 to return to menu");
 		try {
 			out.println("Patient id: ");
+			out.println("plsinput");
 			patientId = in.readLine();
 			out.println("Doctor id: ");
+			out.println("plsinput");
 			doctorId = in.readLine();
 			out.println("Nurse id: ");
+			out.println("plsinput");
 			nurseId = in.readLine();
 			out.println("Division: ");
+			out.println("plsinput");
 			division = in.readLine();
 			out.println("Disease: ");
+			out.println("plsinput");
 			disease = in.readLine();		
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -188,6 +192,7 @@ public class Server implements Runnable {
 		MedicalRecord mr = new MedicalRecord(patientId, doctorId, nurseId, division, disease);
 		if (db.addMedicalRecord(mr)){
 			out.println("Record was added with info " + mr.toString());
+			out.println("done");
 		}
 		
 	}

@@ -6,6 +6,7 @@ import javax.net.ssl.*;
 import javax.security.cert.X509Certificate;
 import java.security.KeyStore;
 import java.security.cert.*;
+import java.security.cert.PKIXRevocationChecker.Option;
 import java.util.Scanner;
 
 /*
@@ -27,27 +28,13 @@ public class Client {
 	private boolean connected;
 	private SSLSocket socket;
 	private BufferedReader in;
+	private Scanner s;
 
 	public Client() {
 		trustStorePW = "password".toCharArray();
 
 	}
 
-	public void sendMessage(String message) throws IOException {
-		if (!message.equals("0")) {
-			BufferedReader read = new BufferedReader(new InputStreamReader(System.in));
-			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			String msg;
-
-			msg = message;
-
-			out.println(msg);
-			out.flush();
-		} else {
-			printMenu();
-		}
-	}
 
 	public boolean initConnection(KeyManagerFactory kmf, String host, int port) {
 		this.kmf = kmf;
@@ -94,6 +81,7 @@ public class Client {
 			System.out.println("socket after handshake:\n" + socket + "\n");
 			System.out.println("secure connection established\n\n");
 			connected = true;
+			s = new Scanner(System.in);
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -119,18 +107,21 @@ public class Client {
 		System.out.println("1: List records \n2: Create new record  \n0: Exit");
 
 		// Ändra tillbaka till console.in om detta inte funkar i terminalen
-		String option = new Scanner(System.in).nextLine();
+		String option = s.nextLine();
+		StringBuilder sb = new StringBuilder("menu");
 		switch (option) {
 		case "1":
 			try {
-				sendMessage(option);
+				sb.append("1");
+				sendMessage(sb.toString());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			break;
 		case "2":
 			try {
-				sendMessage(option);
+				sb.append("2");
+				sendMessage(sb.toString());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -140,20 +131,44 @@ public class Client {
 			break;
 		default:
 			System.out.println("No such option.\n");
+			printMenu();
 			break;
 		}
 	}
 
+	public void sendMessage(String message) throws IOException {
+		if (!message.equals("0")) {
+			BufferedReader read = new BufferedReader(new InputStreamReader(System.in));
+			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+			out.println(message);
+			out.flush();
+		} else {
+			printMenu();
+		}
+	}
+	
+	private void sendMessage() throws IOException{
+		String option = s.nextLine();
+		while (option.isEmpty()){
+			option = s.nextLine();
+		}
+		sendMessage(option);
+
+
+	}
+	
 	public void receiveMessage() {
 		try {
 			String message = in.readLine();
-			if(message != null){
-				System.out.println(message);
+			if(message.equals("done")){
+				sendMessage();
+			} else if(message.equals("plsinput")){
+				sendMessage();
 			}
-			Scanner s = new Scanner(System.in);
-			if (s.hasNext()){
-				String option = s.nextLine();
-				sendMessage(option);
+				else {
+				System.out.println(message);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
