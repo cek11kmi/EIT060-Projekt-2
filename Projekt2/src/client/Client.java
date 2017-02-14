@@ -104,7 +104,7 @@ public class Client {
 
 	public void printMenu() {
 		System.out.println("Service selector");
-		System.out.println("1: List records \n2: Create new record  \n0: Exit");
+		System.out.println("1: List records \n2: Create new record \n3: Edit record \n0: Exit");
 
 		// Ändra tillbaka till console.in om detta inte funkar i terminalen
 		String option = s.nextLine();
@@ -121,6 +121,14 @@ public class Client {
 		case "2":
 			try {
 				sb.append("2");
+				sendMessage(sb.toString());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			break;
+		case "3":
+			try {
+				sb.append("3");
 				sendMessage(sb.toString());
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -166,8 +174,7 @@ public class Client {
 				sendMessage();
 			} else if (message.equals("plsmenu")){
 				printMenu();
-			}
-				else {
+			} else {
 				System.out.println(message);
 			}
 		} catch (IOException e) {
