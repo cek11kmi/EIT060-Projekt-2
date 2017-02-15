@@ -73,8 +73,8 @@ public class MedicalRecord {
 	
 	@Override
 	public String toString() {
-		String patient = ("Patient: " + patientId + "\nDoctor: "
-				+ doctorId + "\nNurse: " + nurseId + "\nDivision: " + division + "\nDisease: " + disease);
+		String patient = ("Patient: " + patientId + ";Doctor: "
+				+ doctorId + ";Nurse: " + nurseId + ";Division: " + division + ";Disease: " + disease);
 		return patient;
 	}
 }

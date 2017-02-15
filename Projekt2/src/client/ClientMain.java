@@ -95,10 +95,10 @@ public class ClientMain {
 		if (!(client.initConnection(kmf, host, port))) {
 			System.out.println("Connection failed!");
 		}
-		client.printMenu();
+		
 		while (client.isConnected()) {
-			
-			client.receiveMessage();
+			client.printMenu();
+
 		}
 	}
 

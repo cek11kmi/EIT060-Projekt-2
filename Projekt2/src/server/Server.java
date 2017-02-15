@@ -50,24 +50,25 @@ public class Server implements Runnable {
 
 				System.out.println("client authenticated");
 				System.out.println("client title is " + title);
+				title = title.toLowerCase();
 
 				// retrieves the users name from the database
 				String name = "";
 				int id = 0;
 				switch (title) {
-				case "Patient":
+				case "patient":
 					id = db.getPatientId(serialNbrString);
 					name = db.getPatientName(id);
 					break;
-				case "Nurse":
+				case "nurse":
 					id = db.getNurseId(serialNbrString);
 					name = db.getNurseName(id);
 					break;
-				case "Doctor":
+				case "doctor":
 					id = db.getDoctorId(serialNbrString);
 					name = db.getDoctorName(id);
 					break;
-				case "Government":
+				case "government":
 					System.out.println("client is government");
 				}
 				if (!name.equals("")) {
@@ -88,7 +89,8 @@ public class Server implements Runnable {
 
 				String clientMsg = null;
 				while ((clientMsg = in.readLine()) != null) {
-					receivedMsg(in, out, clientMsg, id, title);
+					receivedMsg(out, clientMsg, id, title);
+					System.out.println("Received: " + clientMsg + " from client");
 				}
 				in.close();
 				out.close();
@@ -101,9 +103,11 @@ public class Server implements Runnable {
 			System.out.println("Client died: " + e.getMessage());
 			e.printStackTrace();
 			return;
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 	}
-
+	//EJ FÄRDIG ALLS
 	private void editRecord(MedicalRecord mr, BufferedReader in, PrintWriter out, int id, String title) {
 		String patientId = "";
 		String doctorId = "";
@@ -139,22 +143,11 @@ public class Server implements Runnable {
 		if (!division.isEmpty()) {
 			mr.setDivision(division);
 		}
-		db.updateMedicalRecord(mr);
-	}
-
-	private List<MedicalRecord> getReadableRecords(String title, int id) {
-		title = title.toLowerCase();
-		List<MedicalRecord> recordList = new ArrayList<MedicalRecord>();
-		if (title.equals("patient")) {
-			// recordList = db.getMedicalRecord(id);
-		} else if (title.equals("doctor")) {
-			recordList = db.getMedicalRecordsByDivisionAndDoctor(db.getDoctorDivision(id), id);
-		} else if (title.equals("nurse")) {
-			recordList = db.getMedicalRecordsByDivisionAndNurse(db.getNurseDivision(id), id);
-		} else if (title.equals("government")) {
-			recordList = db.getMedicalRecords();
+		try {
+			db.updateMedicalRecord(mr);
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
-		return recordList;
 	}
 
 	private void newListener() {
@@ -169,10 +162,9 @@ public class Server implements Runnable {
 			System.out.println("Database not connected");
 			System.exit(0);
 		}
-
 	}
 
-	private String authentication(String serialNbrString) {
+	private String authentication(String serialNbrString) throws SQLException {
 		if (!(serialNbrString.equals(""))) {
 			return db.getUserTitle(serialNbrString);
 		} else {
@@ -181,82 +173,115 @@ public class Server implements Runnable {
 		}
 	}
 
-	private void receivedMsg(BufferedReader in, PrintWriter out, String msg, int id, String title) throws IOException {
-		switch (msg) {
-		case "menu1":
-			printRecords(out, id, title);
-			out.println("Välj ID som du vill läsa (PÅ SVENSKA)");
-			out.println("done");
-			String recordId = in.readLine();
-			MedicalRecord mr = db.getMedicalRecord(Integer.parseInt(recordId));
-			if (mr == null) {
-				out.println("ID finns ej");
+	private void receivedMsg(PrintWriter out, String msg, int id, String title) throws IOException, SQLException {
+		String[] message = msg.split(";");
+		String messageToSend = null;
+		switch (message[0]) {
+		case "menu":
+			messageToSend = handleMenu(message, id, title);
+			break;
+		case "addRecord":
+			if (!title.equals("doctor")) {
+				messageToSend = "You do not have permission to add records";
 			} else {
-				out.println(mr.toString());
+				messageToSend = addRecord(message, id);
 			}
-			out.println("plsmenu");
-
 			break;
-		case "menu2":
-			addRecord(in, out, id, title);
-			break;
-		case "menu3":
-			printRecords(out, id, title);
-			out.println("Choose ID to edit");
+		}
+		if (messageToSend != null) {
+			out.println(messageToSend);
 			out.println("done");
-			String recordToEditId = in.readLine();
-			MedicalRecord mrToEdit = db.getMedicalRecord(Integer.parseInt(recordToEditId));
-			editRecord(mrToEdit, in, out, id, title);
+			out.flush();
+		}
+	}
+
+	private String handleMenu(String[] message, int id, String title) throws SQLException {
+		StringBuilder sb = new StringBuilder();
+		String messageToSend = null;
+		switch (message[1]) {
+		case "1":
+			if (message.length > 2) {
+				if (message[2].equals("id")) {
+					int enteredId = Integer.parseInt(message[3]);
+					boolean found = false;
+					for (MedicalRecord mr : getReadableRecords(title, id)) {
+						if (mr.getRecordId() == enteredId) {
+							found = true;
+							sb.append("Patient id: " + mr.getPatientId() + "\tPatient name: "
+									+ db.getPatientName(mr.getPatientId()) + "\nDoctor id: " + mr.getDoctorId()
+									+ "\tDoctor name: " + db.getDoctorName(mr.getDoctorId()) + "\nNurse id: "
+									+ mr.getNurseId() + "\tNurse name: " + db.getNurseName(mr.getNurseId())
+									+ "\nDivision: " + mr.getDivision() + "\nDisease: " + mr.getDisease());
+							break;
+						}
+					}
+					if (!found) {
+						sb.append("Invalid record id entered");
+					}
+				}
+			} else {
+				sb.append(printRecords(id, title));
+				sb.append("\nEnter an id to read more\n");
+			}
+			messageToSend = sb.toString();
+			break;
+		case "2":
+			break;
 		default:
+			messageToSend = "Unknown option";
 			break;
 		}
+		return messageToSend;
+
 	}
 
-	private void printRecords(PrintWriter out, int id, String title) {
+	private String printRecords(int id, String title) throws SQLException {
 		List<MedicalRecord> recordList = getReadableRecords(title, id);
-		out.println("The records you can read are");
+		StringBuilder sb = new StringBuilder("The records you can read are\nRecord id\tPatient name\n");
 		for (MedicalRecord mr : recordList) {
-			out.println("Record id: " + mr.getRecordId() + " Name: " + db.getPatientName(mr.getPatientId()));
+			sb.append(mr.getRecordId() + "\t\t" + db.getPatientName(mr.getPatientId()) + "\n");
 		}
-		// sends done to let client know its done
-
-		out.flush();
+		sb.delete(sb.length() - 2, sb.length() - 1);
+		return sb.toString();
 	}
 
-	private void addRecord(BufferedReader in, PrintWriter out, int id, String title) {
-		String patientId = "";
-		String doctorId = "";
-		String nurseId = "";
-		String division = "";
-		String disease = "";
-		try {
-			out.println("Patient id: ");
-			out.println("plsinput");
-			patientId = in.readLine();
-			out.println("Doctor id: ");
-			out.println("plsinput");
-			doctorId = in.readLine();
-			out.println("Nurse id: ");
-			out.println("plsinput");
-			nurseId = in.readLine();
-			out.println("Division: ");
-			out.println("plsinput");
-			division = in.readLine();
-			out.println("Disease: ");
-			out.println("plsinput");
-			disease = in.readLine();
-		} catch (IOException e) {
-			e.printStackTrace();
+	private List<MedicalRecord> getReadableRecords(String title, int id) throws SQLException {
+		title = title.toLowerCase();
+		List<MedicalRecord> recordList = new ArrayList<MedicalRecord>();
+		if (title.equals("patient")) {
+			recordList = db.getMedicalRecordsByPatient(id);
+		} else if (title.equals("doctor")) {
+			recordList = db.getMedicalRecordsByDivisionAndDoctor(db.getDoctorDivision(id), id);
+		} else if (title.equals("nurse")) {
+			recordList = db.getMedicalRecordsByDivisionAndNurse(db.getNurseDivision(id), id);
+		} else if (title.equals("government")) {
+			recordList = db.getMedicalRecords();
 		}
-		MedicalRecord mr = new MedicalRecord(patientId, doctorId, nurseId, division, disease);
-		try {
+		return recordList;
+	}
+
+	private String addRecord(String[] message, int id) throws SQLException {
+		String messageToSend = null;
+		String patientId = message[1];
+		String doctorId = String.valueOf(id);
+		String nurseId = message[2];
+		String division = message[3];
+		String disease = message[4];
+
+		if (db.getDoctorPatients(id).contains(patientId)) {
+			MedicalRecord mr = new MedicalRecord(patientId, doctorId, nurseId, division, disease);
 			db.addMedicalRecord(mr);
-			out.println("Record was added with info " + mr.toString());
-			out.println("done");
-		} catch (SQLException e) {
-			out.println("Wrong indate");
-			out.println("plsmenu");
+			String patientName = db.getPatientName(Integer.parseInt(patientId));
+			String doctorName = db.getDoctorName(id);
+			String nurseName = db.getNurseName(Integer.parseInt(nurseId));
+			messageToSend = ("You added the following record\nPatient id: " + patientId + "\tPatient name: "
+					+ patientName + "\nDoctor id: " + id + "\tDoctor name: " + doctorName + "\nNurse id: " + nurseId
+					+ "\tNurse name: " + nurseName + "\nDivision: " + division + "\nDisease: " + disease);
+			;
+		} else {
+			messageToSend = "This is not your patient";
 		}
-
+		return messageToSend;
 	}
+
 }

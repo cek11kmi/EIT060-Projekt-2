@@ -7,6 +7,7 @@ import javax.security.cert.X509Certificate;
 import java.security.KeyStore;
 import java.security.cert.*;
 import java.security.cert.PKIXRevocationChecker.Option;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /*
@@ -28,13 +29,14 @@ public class Client {
 	private boolean connected;
 	private SSLSocket socket;
 	private BufferedReader in;
+	private PrintWriter out;
 	private Scanner s;
+	private String messageToSend;
 
 	public Client() {
 		trustStorePW = "password".toCharArray();
 
 	}
-
 
 	public boolean initConnection(KeyManagerFactory kmf, String host, int port) {
 		this.kmf = kmf;
@@ -82,6 +84,8 @@ public class Client {
 			System.out.println("secure connection established\n\n");
 			connected = true;
 			s = new Scanner(System.in);
+			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			out = new PrintWriter(socket.getOutputStream(), true);
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -102,37 +106,28 @@ public class Client {
 		connected = false;
 	}
 
-	public void printMenu() {
+	public void printMenu() throws IOException {
 		System.out.println("Service selector");
 		System.out.println("1: List records \n2: Create new record \n3: Edit record \n0: Exit");
 
 		// Ändra tillbaka till console.in om detta inte funkar i terminalen
 		String option = s.nextLine();
-		StringBuilder sb = new StringBuilder("menu");
+		StringBuilder sb = new StringBuilder("menu;");
 		switch (option) {
 		case "1":
-			try {
-				sb.append("1");
-				sendMessage(sb.toString());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			sb.append("1");
+			messageToSend = sb.toString();
+			sendMessage();
+			receiveMessage();
+			readMore();
 			break;
 		case "2":
-			try {
-				sb.append("2");
-				sendMessage(sb.toString());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			addMedicalRecord();
+			receiveMessage();
 			break;
 		case "3":
-			try {
-				sb.append("3");
-				sendMessage(sb.toString());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			sb.append("3");
+			messageToSend = sb.toString();
 			break;
 		case "0":
 			System.exit(0);
@@ -144,81 +139,82 @@ public class Client {
 		}
 	}
 
-	public void sendMessage(String message) throws IOException {
-
-			BufferedReader read = new BufferedReader(new InputStreamReader(System.in));
-			PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-			in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-			out.println(message);
-			out.flush();
-		
-	}
-	
-	private void sendMessage() throws IOException{
-		String option = s.nextLine();
-		while (option.isEmpty()){
-			option = s.nextLine();
+	private void readMore() throws IOException {
+		StringBuilder sb = new StringBuilder("menu;1;id;");
+		String enteredId = s.nextLine();
+		System.out.println("Hej");
+		while (!checkId(enteredId)) {
+			System.out.println("Enter a record id:");
+			enteredId = s.nextLine();
 		}
-		sendMessage(option);
-
-
+		sb.append(enteredId);
+		messageToSend = sb.toString();
+		System.out.println(messageToSend);
+		sendMessage();
+		receiveMessage();
 	}
-	
-	public void receiveMessage() {
-		try {
-			String message = in.readLine();
-			if(message.equals("done")){
-				sendMessage();
-			} else if(message.equals("plsinput")){
-				sendMessage();
-			} else if (message.equals("plsmenu")){
-				printMenu();
-			} else {
-				System.out.println(message);
+
+	public void sendMessage() throws IOException {
+		// BufferedReader read = new BufferedReader(new
+		// InputStreamReader(System.in));
+		System.out.println(messageToSend);
+		out.println(messageToSend);
+	}
+
+	public void receiveMessage() throws IOException {
+		String serverMsg = null;
+		while (!(serverMsg = in.readLine()).equals("done")) {
+			if (!serverMsg.isEmpty()){
+				System.out.println(serverMsg);
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
+
+	/**
+	 * This method constructs a string that will be sent to the server with the
+	 * info required to create a medical record
+	 * 
+	 * @throws IOException
+	 */
+	private void addMedicalRecord() throws IOException {
+		System.out.println("Patient id: ");
+		String patientId = s.nextLine();
+		while (!checkId(patientId)) {
+			System.out.println("Patient id: ");
+			patientId = s.nextLine();
+		}
+		System.out.println("Nurse id: ");
+		String nurseId = s.nextLine();
+		while (!checkId(nurseId)) {
+			System.out.println("Nurse id: ");
+			nurseId = s.nextLine();
+		}
+		System.out.println("Division: ");
+		String division = s.nextLine();
+
+		System.out.println("Disease: ");
+		String disease = s.nextLine();
+
+		String message = ("addRecord;" + patientId + ";" + nurseId + ";" + division + ";" + disease);
+		messageToSend = message;
+		sendMessage();
+	}
+
+	/**
+	 * This method checks if an entered id is able to be converted to an int
+	 * 
+	 * @param id
+	 *            the Id that should be checked
+	 * @return true if it's a valid id and false if not
+	 */
+	private boolean checkId(String id) {
+		try {
+			Integer.parseInt(id);
+		} catch (Exception e) {
+			System.out.println("Invalid input, please input a valid id");
+			return false;
+		}
+		return true;
+	}
+
 }
-
-// BufferedReader read = new BufferedReader(new InputStreamReader(System.in));
-// PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-// BufferedReader in = new BufferedReader(new
-// InputStreamReader(socket.getInputStream()));
-// String msg;
-// for (;;) {
-// printMenu();
-// System.out.print(">");
-// msg = read.readLine();
-//
-// switch (msg){
-// case "1":
-// System.out.print("Input the string you want backwards");
-// System.out.print(">");
-// msg = read.readLine();
-// System.out.print("sending '" + msg + "' to server...");
-// out.println(msg);
-// out.flush();
-// System.out.println("done");
-// System.out.println("received '" + in.readLine() + "' from server\n");
-// break;
-// case "0":
-// in.close();
-// out.close();
-// read.close();
-// socket.close();
-// }
-// }
-//
-// }
-// }
-
-// static void printMenu(){
-// System.out.println("Choose by entering a number");
-// System.out.println("1. Your input will be repeated to you backwards");
-// System.out.println("0. Exit");
-// }
-//
-// }
