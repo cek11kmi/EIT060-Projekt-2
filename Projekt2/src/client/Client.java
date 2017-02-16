@@ -59,7 +59,8 @@ public class Client {
 				throw new IOException(e.getMessage());
 			}
 			socket = (SSLSocket) factory.createSocket(host, port);
-			//System.out.println("\nsocket before handshake:\n" + socket + "\n");
+			// System.out.println("\nsocket before handshake:\n" + socket +
+			// "\n");
 
 			/*
 			 * send http request
@@ -72,15 +73,18 @@ public class Client {
 			SSLSession session = socket.getSession();
 			X509Certificate cert = (X509Certificate) session.getPeerCertificateChain()[0];
 			String subject = cert.getSubjectDN().getName();
-			//System.out.println(
-					//"certificate name (subject DN field) on certificate received from server:\n" + subject + "\n");
+			// System.out.println(
+			// "certificate name (subject DN field) on certificate received from
+			// server:\n" + subject + "\n");
 
 			String issuer = cert.getIssuerDN().getName();
-			//System.out.println("issuer on certificate received from server:\n" + issuer + "\n");
+			// System.out.println("issuer on certificate received from
+			// server:\n" + issuer + "\n");
 
-			//System.out.println("serialnumber on certificate received from server:\n" + cert.getSerialNumber() + "\n");
+			// System.out.println("serialnumber on certificate received from
+			// server:\n" + cert.getSerialNumber() + "\n");
 
-			//System.out.println("socket after handshake:\n" + socket + "\n");
+			// System.out.println("socket after handshake:\n" + socket + "\n");
 			System.out.println("secure connection established\n\n");
 			connected = true;
 			s = new Scanner(System.in);
@@ -126,8 +130,7 @@ public class Client {
 			receiveMessage();
 			break;
 		case "3":
-			sb.append("3");
-			messageToSend = sb.toString();
+			editRecord();
 			break;
 		case "0":
 			System.exit(0);
@@ -139,10 +142,35 @@ public class Client {
 		}
 	}
 
+	private void editRecord() throws IOException {
+		System.out.println("Record id: ");
+		String recordId = s.nextLine();
+		while (!checkParsability(recordId)) {
+			System.out.println("Record id: ");
+			recordId = s.nextLine();
+		}
+		System.out.println("Nurse id: ");
+		String nurseId = s.nextLine();
+		while (!checkParsability(nurseId)) {
+			System.out.println("Nurse id: ");
+			nurseId = s.nextLine();
+		}
+		System.out.println("Division: ");
+		String division = s.nextLine();
+
+		System.out.println("Disease: ");
+		String disease = s.nextLine();
+
+		String message = ("editRecord;" + recordId + ";" + nurseId + ";" + division + ";" + disease);
+		messageToSend = message;
+		sendMessage();
+
+	}
+
 	private void readMore() throws IOException {
 		StringBuilder sb = new StringBuilder("menu;1;id;");
 		String enteredId = s.nextLine();
-		while (!checkId(enteredId)) {
+		while (!checkParsability(enteredId)) {
 			System.out.println("Enter a record id:");
 			enteredId = s.nextLine();
 		}
@@ -162,7 +190,7 @@ public class Client {
 	public void receiveMessage() throws IOException {
 		String serverMsg = null;
 		while (!(serverMsg = in.readLine()).equals("done")) {
-			if (!serverMsg.isEmpty()){
+			if (!serverMsg.isEmpty()) {
 				System.out.println(serverMsg);
 			}
 		}
@@ -177,13 +205,13 @@ public class Client {
 	private void addMedicalRecord() throws IOException {
 		System.out.println("Patient id: ");
 		String patientId = s.nextLine();
-		while (!checkId(patientId)) {
+		while (!checkParsability(patientId)) {
 			System.out.println("Patient id: ");
 			patientId = s.nextLine();
 		}
 		System.out.println("Nurse id: ");
 		String nurseId = s.nextLine();
-		while (!checkId(nurseId)) {
+		while (!checkParsability(nurseId)) {
 			System.out.println("Nurse id: ");
 			nurseId = s.nextLine();
 		}
@@ -215,7 +243,7 @@ public class Client {
 	 *            the Id that should be checked
 	 * @return true if it's a valid id and false if not
 	 */
-	private boolean checkId(String id) {
+	private boolean checkParsability(String id) {
 		try {
 			Integer.parseInt(id);
 		} catch (Exception e) {

@@ -19,15 +19,16 @@ public class MedicalRecord {
 		this.division = rs.getString("division");
 		this.disease = rs.getString("disease");
 	}
-	
-	public MedicalRecord(String patientId, String doctorId, String nurseId, String division, String disease){
+
+	public MedicalRecord(String patientId, String doctorId, String nurseId, String division, String disease) {
 		this.patientId = Integer.parseInt(patientId);
 		this.doctorId = Integer.parseInt(doctorId);
 		this.nurseId = Integer.parseInt(nurseId);
 		this.division = division;
 		this.disease = disease;
 	}
-	public MedicalRecord(){
+
+	public MedicalRecord() {
 		this.patientId = 1;
 		this.doctorId = 1;
 		this.nurseId = 1;
@@ -35,11 +36,11 @@ public class MedicalRecord {
 		this.disease = "disease";
 	}
 
-	public int getRecordId(){
+	public int getRecordId() {
 		return recordId;
 	}
 
-	public int getPatientId(){
+	public int getPatientId() {
 		return patientId;
 	}
 
@@ -58,23 +59,22 @@ public class MedicalRecord {
 	public String getDisease() {
 		return disease;
 	}
-	
-	public void setNurseId(int nurseId){
+
+	public void setNurseId(int nurseId) {
 		this.nurseId = nurseId;
 	}
-	
-	public void setDivision(String division){
+
+	public void setDivision(String division) {
 		this.division = division;
 	}
-	
+
 	public void setDisease(String disease){
 		this.disease = disease;
 	}
-	
 	@Override
 	public String toString() {
-		String patient = ("Patient: " + patientId + ";Doctor: "
-				+ doctorId + ";Nurse: " + nurseId + ";Division: " + division + ";Disease: " + disease);
+		String patient = ("Patient: " + patientId + ";Doctor: " + doctorId + ";Nurse: " + nurseId + ";Division: "
+				+ division + ";Disease: " + disease);
 		return patient;
 	}
 }

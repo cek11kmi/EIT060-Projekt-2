@@ -75,11 +75,14 @@ public class Server implements Runnable {
 					System.out.println("client name is " + name);
 				}
 
-				//System.out.println("client name (cert subject DN field): " + subject);
+				// System.out.println("client name (cert subject DN field): " +
+				// subject);
 				String issuer = cert.getIssuerDN().getName();
-				//System.out.println("issuer on certificate received from client:\n" + issuer + "\n");
-				//System.out
-						//.println("serialnumber on certificate received from client:\n" + cert.getSerialNumber() + "\n");
+				// System.out.println("issuer on certificate received from
+				// client:\n" + issuer + "\n");
+				// System.out
+				// .println("serialnumber on certificate received from
+				// client:\n" + cert.getSerialNumber() + "\n");
 				System.out.println(numConnectedClients + " concurrent connection(s)\n");
 
 				PrintWriter out = null;
@@ -107,47 +110,32 @@ public class Server implements Runnable {
 			e.printStackTrace();
 		}
 	}
-	//EJ FÄRDIG ALLS
-	private void editRecord(MedicalRecord mr, BufferedReader in, PrintWriter out, int id, String title) {
-		String patientId = "";
-		String doctorId = "";
-		String nurseId = "";
-		String division = "";
-		String disease = "";
-		try {
-			out.println("Empty inputs wont be edited");
-			out.println("Patient id: ");
-			out.println("plsinput");
-			patientId = in.readLine();
-			out.println("Doctor id: ");
-			out.println("plsinput");
-			doctorId = in.readLine();
-			out.println("Nurse id: ");
-			out.println("plsinput");
-			nurseId = in.readLine();
-			out.println("Division: ");
-			out.println("plsinput");
-			division = in.readLine();
-			out.println("Disease: ");
-			out.println("plsinput");
-			disease = in.readLine();
-		} catch (IOException e) {
-			e.printStackTrace();
+
+	// EJ FÄRDIG ALLS
+	private String editRecord(int editorsId, String[] message, String title) throws SQLException {
+		String messageToSend = null;
+		String recordId = message[1];
+		String nurseId = message[2];
+		String division = message[3];
+		String disease = message[4];
+		for (MedicalRecord mr : getWriteableRecords(title, editorsId)) {
+			if (mr.getRecordId() == Integer.parseInt(recordId)) {
+				mr.setDisease(disease);
+				mr.setDivision(division);
+				mr.setNurseId(Integer.parseInt(nurseId));
+				if(db.updateMedicalRecord(mr)){
+					return ("You added the following record\nPatient id: " + mr.getPatientId() + "\tPatient name: "
+							+ db.getPatientName(mr.getPatientId()) + "\nDoctor id: " + mr.getDoctorId() + "\tDoctor name: " + db.getDoctorName(mr.getDoctorId()) + "\nNurse id: " + nurseId
+							+ "\tNurse name: " + db.getNurseName(mr.getNurseId()) + "\nDivision: " + division + "\nDisease: " + disease);				
+				} else {
+					return "Could not edit record.";
+				}
+				
+			} 
 		}
-		if (!disease.isEmpty()) {
-			mr.setDisease(disease);
-		}
-		if (!nurseId.isEmpty()) {
-			mr.setNurseId(Integer.parseInt(nurseId));
-		}
-		if (!division.isEmpty()) {
-			mr.setDivision(division);
-		}
-		try {
-			db.updateMedicalRecord(mr);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		return ("Not authorized to edit this record");
+		
+		
 	}
 
 	private void newListener() {
@@ -187,6 +175,9 @@ public class Server implements Runnable {
 				messageToSend = addRecord(message, id);
 			}
 			break;
+		case "editRecord":
+
+			messageToSend = editRecord(id, message, title);
 		}
 		if (messageToSend != null) {
 			out.println(messageToSend);
@@ -250,6 +241,20 @@ public class Server implements Runnable {
 		List<MedicalRecord> recordList = new ArrayList<MedicalRecord>();
 		if (title.equals("patient")) {
 			recordList = db.getMedicalRecordsByPatient(id);
+		} else if (title.equals("doctor")) {
+			recordList = db.getMedicalRecordsByDivisionAndDoctor(db.getDoctorDivision(id), id);
+		} else if (title.equals("nurse")) {
+			recordList = db.getMedicalRecordsByDivisionAndNurse(db.getNurseDivision(id), id);
+		} else if (title.equals("government")) {
+			recordList = db.getMedicalRecords();
+		}
+		return recordList;
+	}
+
+	private List<MedicalRecord> getWriteableRecords(String title, int id) throws SQLException {
+		title = title.toLowerCase();
+		List<MedicalRecord> recordList = new ArrayList<MedicalRecord>();
+		if (title.equals("patient")) {
 		} else if (title.equals("doctor")) {
 			recordList = db.getMedicalRecordsByDivisionAndDoctor(db.getDoctorDivision(id), id);
 		} else if (title.equals("nurse")) {
