@@ -272,6 +272,42 @@ public class Database {
 		closePs(ps, rs);
 		return recordsList;
 	}
+	
+	public List<MedicalRecord> getMedicalRecordsByNurse(int nurseId) throws SQLException {
+		List<MedicalRecord> recordsList = new LinkedList<MedicalRecord>();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		String sql = "SELECT *\n"
+				+ "FROM medical_records\n" + "WHERE nurse_id = ?";
+		ps = conn.prepareStatement(sql);
+		ps.setInt(1, nurseId);
+		rs = ps.executeQuery();
+		while (rs.next()) {
+			recordsList.add(new MedicalRecord(rs));
+		}
+
+		closePs(ps, rs);
+		return recordsList;
+	}
+	
+	public List<MedicalRecord> getMedicalRecordsByDoctor(int doctorId) throws SQLException {
+		List<MedicalRecord> recordsList = new LinkedList<MedicalRecord>();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		String sql = "SELECT *\n"
+				+ "FROM medical_records\n" + "WHERE doctor_id = ?";
+		ps = conn.prepareStatement(sql);
+		ps.setInt(1, doctorId);
+		rs = ps.executeQuery();
+		while (rs.next()) {
+			recordsList.add(new MedicalRecord(rs));
+		}
+
+		closePs(ps, rs);
+		return recordsList;
+	}
 
 	public String getNurseName(int nurseId) throws SQLException {
 		PreparedStatement ps = null;
