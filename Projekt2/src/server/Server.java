@@ -149,7 +149,7 @@ public class Server implements Runnable {
 	} // calls run()
 
 	private void startDb() throws SQLException {
-		if (db.openConnection("serverassets/db/hospital.db")) {
+		if (db.openConnection("serverassets/db/hospitalImproved.db")) {
 			System.out.println("Database connected");
 			db.foreignKey();
 		} else {
@@ -234,7 +234,7 @@ public class Server implements Runnable {
 
 	private String printRecords(int id, String title) throws SQLException {
 		List<MedicalRecord> recordList = getReadableRecords(title, id);
-		StringBuilder sb = new StringBuilder("The records you can read are\nRecord id\tPatient name\n");
+		StringBuilder sb = new StringBuilder("The records you can read are\nRecord id\tPatient name \n");
 		for (MedicalRecord mr : recordList) {
 			sb.append(mr.getRecordId() + "\t\t" + db.getPatientName(mr.getPatientId()) + "\n");
 		}
@@ -279,7 +279,7 @@ public class Server implements Runnable {
 		String division = message[3];
 		String disease = message[4];
 
-		if (db.getDoctorPatients(id).contains(patientId)) {
+		if (db.getDoctorPatients(id).contains(Integer.parseInt(patientId))) {
 			MedicalRecord mr = new MedicalRecord(patientId, doctorId, nurseId, division, disease);
 			db.addMedicalRecord(mr);
 			String patientName = db.getPatientName(Integer.parseInt(patientId));
@@ -290,6 +290,7 @@ public class Server implements Runnable {
 					+ "\tNurse name: " + nurseName + "\nDivision: " + division + "\nDisease: " + disease);
 			;
 		} else {
+			System.out.println(doctorId);
 			messageToSend = "This is not your patient";
 		}
 		return messageToSend;
