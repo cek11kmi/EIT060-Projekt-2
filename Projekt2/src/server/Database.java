@@ -372,7 +372,7 @@ public class Database {
 	public boolean updateMedicalRecord(MedicalRecord mr) throws SQLException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
-		String sql = "UPDATE medical_records\n" + "SET nurse_id = ?\n" + "SET division = ?\n" + "SET disease = ?\n"
+		String sql = "UPDATE medical_records\n" + "SET nurse_id = ?,\n" + " division = ?,\n" + "disease = ?\n"
 				+ "WHERE record_id = ?";
 		ps = conn.prepareStatement(sql);
 		ps.setInt(1, mr.getNurseId());

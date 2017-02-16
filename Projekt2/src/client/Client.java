@@ -131,6 +131,7 @@ public class Client {
 			break;
 		case "3":
 			editRecord();
+			receiveMessage();
 			break;
 		case "0":
 			System.exit(0);

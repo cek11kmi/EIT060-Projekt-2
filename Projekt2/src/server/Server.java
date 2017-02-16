@@ -124,7 +124,7 @@ public class Server implements Runnable {
 				mr.setDivision(division);
 				mr.setNurseId(Integer.parseInt(nurseId));
 				if(db.updateMedicalRecord(mr)){
-					return ("You added the following record\nPatient id: " + mr.getPatientId() + "\tPatient name: "
+					return ("The record after the edit\nPatient id: " + mr.getPatientId() + "\tPatient name: "
 							+ db.getPatientName(mr.getPatientId()) + "\nDoctor id: " + mr.getDoctorId() + "\tDoctor name: " + db.getDoctorName(mr.getDoctorId()) + "\nNurse id: " + nurseId
 							+ "\tNurse name: " + db.getNurseName(mr.getNurseId()) + "\nDivision: " + division + "\nDisease: " + disease);				
 				} else {
