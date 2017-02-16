@@ -189,9 +189,19 @@ public class Client {
 		}
 		System.out.println("Division: ");
 		String division = s.nextLine();
+		while (division.isEmpty()){
+			System.out.println("Please input a division");
+			System.out.println("Division: ");
+			division = s.nextLine();
+		}	
 
 		System.out.println("Disease: ");
 		String disease = s.nextLine();
+		while (disease.isEmpty()){
+			System.out.println("Please input a disease");
+			System.out.println("Disease: ");
+			disease = s.nextLine();
+		}	
 
 		String message = ("addRecord;" + patientId + ";" + nurseId + ";" + division + ";" + disease);
 		messageToSend = message;
