@@ -120,9 +120,15 @@ public class Server implements Runnable {
 		String disease = message[4];
 		for (MedicalRecord mr : getWriteableRecords(title, editorsId)) {
 			if (mr.getRecordId() == Integer.parseInt(recordId)) {
-				mr.setDisease(disease);
-				mr.setDivision(division);
-				mr.setNurseId(Integer.parseInt(nurseId));
+				if(!disease.isEmpty()){					
+					mr.setDisease(disease);
+				}
+				if(!division.isEmpty()){					
+					mr.setDivision(division);
+				}
+				if(!nurseId.isEmpty()){					
+					mr.setNurseId(Integer.parseInt(nurseId));
+				}
 				if(db.updateMedicalRecord(mr)){
 					return ("The record after the edit\nPatient id: " + mr.getPatientId() + "\tPatient name: "
 							+ db.getPatientName(mr.getPatientId()) + "\nDoctor id: " + mr.getDoctorId() + "\tDoctor name: " + db.getDoctorName(mr.getDoctorId()) + "\nNurse id: " + nurseId
@@ -133,7 +139,7 @@ public class Server implements Runnable {
 				
 			} 
 		}
-		return ("Not authorized to edit this record");
+		return ("Not authorized to edit this record or it doesn't exist");
 		
 		
 	}
