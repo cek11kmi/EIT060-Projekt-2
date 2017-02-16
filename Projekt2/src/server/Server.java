@@ -132,24 +132,32 @@ public class Server implements Runnable {
 			return "";
 		}
 	}
-
-	private void receivedMsg(PrintWriter out, String msg, int id, String title) throws IOException, SQLException {
+	/**
+	 * msg is an array where the first index chooses what method to call in the server. Rest of fields are data to be used by other methods.
+	 * @param out 
+	 * @param msg String array
+	 * @param currentUserId
+	 * @param title
+	 * @throws IOException
+	 * @throws SQLException
+	 */
+	private void receivedMsg(PrintWriter out, String msg, int currentUserId, String title) throws IOException, SQLException {
 		String[] message = msg.split(";");
 		String messageToSend = null;
 		switch (message[0]) {
 		case "menu":
-			messageToSend = handleMenu(message, id, title);
+			messageToSend = handleMenu(message, currentUserId, title);
 			break;
 		case "addRecord":
 			if (!title.equals("doctor")) {
 				messageToSend = "You do not have permission to add records";
 			} else {
-				messageToSend = addRecord(message, id);
+				messageToSend = addRecord(message, currentUserId);
 			}
 			break;
 		case "editRecord":
-
-			messageToSend = editRecord(id, message, title);
+			messageToSend = editRecord(currentUserId, message, title);
+			break;
 		}
 		if (messageToSend != null) {
 			out.println(messageToSend);
@@ -157,7 +165,14 @@ public class Server implements Runnable {
 			out.flush();
 		}
 	}
-
+	/**
+	 * 
+	 * @param message
+	 * @param id
+	 * @param title
+	 * @return
+	 * @throws SQLException
+	 */
 	private String handleMenu(String[] message, int id, String title) throws SQLException {
 		StringBuilder sb = new StringBuilder();
 		String messageToSend = null;
@@ -237,6 +252,19 @@ public class Server implements Runnable {
 		return recordList;
 	}
 
+	/**
+	 * Takes data in form of a string array with the following data. Empty
+	 * fields wont be edited 0: Action to be performed (Not used in this method)
+	 * 1: Id of the patient 2: NurseId for the record 3: Division for the record
+	 * 4: Disease for the record
+	 * 
+	 * @param message
+	 *            A string array with data to make a record of.
+	 * @param id
+	 *            Id of the doctor creating the record
+	 * @return String with the added data.
+	 * @throws SQLException
+	 */
 	private String addRecord(String[] message, int id) throws SQLException {
 		String messageToSend = null;
 		String patientId = message[1];
@@ -262,6 +290,22 @@ public class Server implements Runnable {
 		return messageToSend;
 	}
 
+	/**
+	 * Takes data in form of a string array with the following data. Empty
+	 * fields wont be edited 0: Action to be performed (Not used in this method)
+	 * 1: Id of the record 2: NurseId to change to 3: Division to change to 4:
+	 * Disease to change to
+	 * 
+	 * If currently logged in user is ot authorized to change record, nothing
+	 * happens.
+	 * 
+	 * @param message
+	 *            A string array with data to make a record of.
+	 * @param id
+	 *            Id of the doctor creating the record
+	 * @return String with the added data.
+	 * @throws SQLException
+	 */
 	private String editRecord(int editorsId, String[] message, String title) throws SQLException {
 		String recordId = message[1];
 		String nurseId = message[2];
@@ -269,29 +313,29 @@ public class Server implements Runnable {
 		String disease = message[4];
 		for (MedicalRecord mr : getWriteableRecords(title, editorsId)) {
 			if (mr.getRecordId() == Integer.parseInt(recordId)) {
-				if(!disease.equals("doNotEdit")){					
+				if (!disease.equals("doNotEdit")) {
 					mr.setDisease(disease);
 				}
-				if(!division.equals("doNotEdit")){					
+				if (!division.equals("doNotEdit")) {
 					mr.setDivision(division);
 				}
-				if(!nurseId.equals("doNotEdit")){					
+				if (!nurseId.equals("doNotEdit")) {
 					mr.setNurseId(Integer.parseInt(nurseId));
 				}
-				if(db.updateMedicalRecord(mr)){
+				if (db.updateMedicalRecord(mr)) {
 					return ("The record after the edit\nPatient id: " + mr.getPatientId() + "\tPatient name: "
-							+ db.getPatientName(mr.getPatientId()) + "\nDoctor id: " + mr.getDoctorId() + "\tDoctor name: " + db.getDoctorName(mr.getDoctorId()) + "\nNurse id: " + nurseId
-							+ "\tNurse name: " + db.getNurseName(mr.getNurseId()) + "\nDivision: " + division + "\nDisease: " + disease);				
+							+ db.getPatientName(mr.getPatientId()) + "\nDoctor id: " + mr.getDoctorId()
+							+ "\tDoctor name: " + db.getDoctorName(mr.getDoctorId()) + "\nNurse id: " + nurseId
+							+ "\tNurse name: " + db.getNurseName(mr.getNurseId()) + "\nDivision: " + division
+							+ "\nDisease: " + disease);
 				} else {
 					return "Could not edit record.";
 				}
-				
-			} 
+
+			}
 		}
 		return ("Not authorized to edit this record or it doesn't exist");
-		
-		
-	}
 
+	}
 
 }
