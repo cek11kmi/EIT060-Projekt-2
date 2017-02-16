@@ -57,7 +57,8 @@ public class ClientMain {
 			 certName = cons.readLine();
 			}
 			try {
-				is = new FileInputStream("clientassets/keystores/" + certName);
+				//is = new FileInputStream("clientassets/keystores/" + certName);
+				is = new FileInputStream(certName);
 				fileFound = true;
 			} catch (FileNotFoundException ex) {
 				System.out.println("File not found! Please try again.");

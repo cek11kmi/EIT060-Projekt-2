@@ -59,7 +59,7 @@ public class Client {
 				throw new IOException(e.getMessage());
 			}
 			socket = (SSLSocket) factory.createSocket(host, port);
-			System.out.println("\nsocket before handshake:\n" + socket + "\n");
+			//System.out.println("\nsocket before handshake:\n" + socket + "\n");
 
 			/*
 			 * send http request
@@ -72,15 +72,15 @@ public class Client {
 			SSLSession session = socket.getSession();
 			X509Certificate cert = (X509Certificate) session.getPeerCertificateChain()[0];
 			String subject = cert.getSubjectDN().getName();
-			System.out.println(
-					"certificate name (subject DN field) on certificate received from server:\n" + subject + "\n");
+			//System.out.println(
+					//"certificate name (subject DN field) on certificate received from server:\n" + subject + "\n");
 
 			String issuer = cert.getIssuerDN().getName();
-			System.out.println("issuer on certificate received from server:\n" + issuer + "\n");
+			//System.out.println("issuer on certificate received from server:\n" + issuer + "\n");
 
-			System.out.println("serialnumber on certificate received from server:\n" + cert.getSerialNumber() + "\n");
+			//System.out.println("serialnumber on certificate received from server:\n" + cert.getSerialNumber() + "\n");
 
-			System.out.println("socket after handshake:\n" + socket + "\n");
+			//System.out.println("socket after handshake:\n" + socket + "\n");
 			System.out.println("secure connection established\n\n");
 			connected = true;
 			s = new Scanner(System.in);
@@ -142,14 +142,12 @@ public class Client {
 	private void readMore() throws IOException {
 		StringBuilder sb = new StringBuilder("menu;1;id;");
 		String enteredId = s.nextLine();
-		System.out.println("Hej");
 		while (!checkId(enteredId)) {
 			System.out.println("Enter a record id:");
 			enteredId = s.nextLine();
 		}
 		sb.append(enteredId);
 		messageToSend = sb.toString();
-		System.out.println(messageToSend);
 		sendMessage();
 		receiveMessage();
 	}
