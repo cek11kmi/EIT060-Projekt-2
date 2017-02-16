@@ -1,18 +1,17 @@
 package server;
 
-import java.io.*;
-import java.math.BigInteger;
-import java.net.*;
-import java.security.KeyStore;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.net.*;
-import javax.net.ssl.*;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocket;
 import javax.security.cert.X509Certificate;
-
-import org.sqlite.SQLiteException;
 
 public class Server implements Runnable {
 	private ServerSocket serverSocket = null;
@@ -109,39 +108,6 @@ public class Server implements Runnable {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-	}
-
-	// EJ FÄRDIG ALLS
-	private String editRecord(int editorsId, String[] message, String title) throws SQLException {
-		String messageToSend = null;
-		String recordId = message[1];
-		String nurseId = message[2];
-		String division = message[3];
-		String disease = message[4];
-		for (MedicalRecord mr : getWriteableRecords(title, editorsId)) {
-			if (mr.getRecordId() == Integer.parseInt(recordId)) {
-				if(!disease.isEmpty()){					
-					mr.setDisease(disease);
-				}
-				if(!division.isEmpty()){					
-					mr.setDivision(division);
-				}
-				if(!nurseId.isEmpty()){					
-					mr.setNurseId(Integer.parseInt(nurseId));
-				}
-				if(db.updateMedicalRecord(mr)){
-					return ("The record after the edit\nPatient id: " + mr.getPatientId() + "\tPatient name: "
-							+ db.getPatientName(mr.getPatientId()) + "\nDoctor id: " + mr.getDoctorId() + "\tDoctor name: " + db.getDoctorName(mr.getDoctorId()) + "\nNurse id: " + nurseId
-							+ "\tNurse name: " + db.getNurseName(mr.getNurseId()) + "\nDivision: " + division + "\nDisease: " + disease);				
-				} else {
-					return "Could not edit record.";
-				}
-				
-			} 
-		}
-		return ("Not authorized to edit this record or it doesn't exist");
-		
-		
 	}
 
 	private void newListener() {
@@ -294,5 +260,37 @@ public class Server implements Runnable {
 		}
 		return messageToSend;
 	}
+
+	private String editRecord(int editorsId, String[] message, String title) throws SQLException {
+		String recordId = message[1];
+		String nurseId = message[2];
+		String division = message[3];
+		String disease = message[4];
+		for (MedicalRecord mr : getWriteableRecords(title, editorsId)) {
+			if (mr.getRecordId() == Integer.parseInt(recordId)) {
+				if(!disease.equals("doNotEdit")){					
+					mr.setDisease(disease);
+				}
+				if(!division.equals("doNotEdit")){					
+					mr.setDivision(division);
+				}
+				if(!nurseId.equals("doNotEdit")){					
+					mr.setNurseId(Integer.parseInt(nurseId));
+				}
+				if(db.updateMedicalRecord(mr)){
+					return ("The record after the edit\nPatient id: " + mr.getPatientId() + "\tPatient name: "
+							+ db.getPatientName(mr.getPatientId()) + "\nDoctor id: " + mr.getDoctorId() + "\tDoctor name: " + db.getDoctorName(mr.getDoctorId()) + "\nNurse id: " + nurseId
+							+ "\tNurse name: " + db.getNurseName(mr.getNurseId()) + "\nDivision: " + division + "\nDisease: " + disease);				
+				} else {
+					return "Could not edit record.";
+				}
+				
+			} 
+		}
+		return ("Not authorized to edit this record or it doesn't exist");
+		
+		
+	}
+
 
 }

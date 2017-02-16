@@ -1,14 +1,20 @@
 package client;
 
-import java.net.*;
-import java.io.*;
-import javax.net.ssl.*;
-import javax.security.cert.X509Certificate;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.security.KeyStore;
-import java.security.cert.*;
-import java.security.cert.PKIXRevocationChecker.Option;
-import java.util.ArrayList;
 import java.util.Scanner;
+
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManagerFactory;
+import javax.security.cert.X509Certificate;
 
 /*
  * This example shows how to set up a key manager to perform client
@@ -152,16 +158,25 @@ public class Client {
 		}
 		System.out.println("Nurse id: ");
 		String nurseId = s.nextLine();
-		while (!checkParsability(nurseId)) {
-			System.out.println("Nurse id: ");
-			nurseId = s.nextLine();
+		if (!nurseId.isEmpty()){
+			while (!checkParsability(nurseId)) {
+				System.out.println("Nurse id: ");
+				nurseId = s.nextLine();
+			}
+		} else {
+			nurseId = "doNotEdit";
 		}
 		System.out.println("Division: ");
 		String division = s.nextLine();
+		if(division.isEmpty()){
+			division = "doNotEdit";
+		}
 
 		System.out.println("Disease: ");
 		String disease = s.nextLine();
-
+		if(disease.isEmpty()){
+			disease = "doNotEdit";
+		}
 		String message = ("editRecord;" + recordId + ";" + nurseId + ";" + division + ";" + disease);
 		messageToSend = message;
 		sendMessage();
@@ -189,12 +204,14 @@ public class Client {
 	}
 
 	public void receiveMessage() throws IOException {
+		System.out.println("");
 		String serverMsg = null;
 		while (!(serverMsg = in.readLine()).equals("done")) {
 			if (!serverMsg.isEmpty()) {
 				System.out.println(serverMsg);
 			}
 		}
+		System.out.println("");
 	}
 
 	/**
