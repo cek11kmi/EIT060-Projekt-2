@@ -21,12 +21,10 @@ public class Main {
 
 		} else {
 			port = "9871";
-			String[] start = { "localhost", port, "clientassets/keystores/doctor_2_keystore", "password" };
+			String[] start = { "localhost", port, "clientassets/keystores/doctor_1_keystore", "password" };
 			String[] smS = { port };
 			ServerMain.main(smS);
 			ClientMain.main(start);
 		}
-
 	}
-
 }

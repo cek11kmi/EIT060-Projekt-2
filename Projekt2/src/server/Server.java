@@ -17,12 +17,14 @@ public class Server implements Runnable {
 	private ServerSocket serverSocket = null;
 	private static int numConnectedClients = 0;
 	private Database db;
+	private Logger log;
 
 	public Server(ServerSocket ss, Database db) throws IOException, SQLException {
 		serverSocket = ss;
 		this.db = db;
 		startDb();
 		newListener();
+		log = new Logger();
 
 	}
 
@@ -68,6 +70,7 @@ public class Server implements Runnable {
 					name = db.getDoctorName(id);
 					break;
 				case "government":
+
 					System.out.println("client is government");
 				}
 				if (!name.equals("")) {
@@ -132,16 +135,21 @@ public class Server implements Runnable {
 			return "";
 		}
 	}
+
 	/**
-	 * msg is an array where the first index chooses what method to call in the server. Rest of fields are data to be used by other methods.
-	 * @param out 
-	 * @param msg String array
+	 * msg is an array where the first index chooses what method to call in the
+	 * server. Rest of fields are data to be used by other methods.
+	 * 
+	 * @param out
+	 * @param msg
+	 *            String array
 	 * @param currentUserId
 	 * @param title
 	 * @throws IOException
 	 * @throws SQLException
 	 */
-	private void receivedMsg(PrintWriter out, String msg, int currentUserId, String title) throws IOException, SQLException {
+	private void receivedMsg(PrintWriter out, String msg, int currentUserId, String title)
+			throws IOException, SQLException {
 		String[] message = msg.split(";");
 		String messageToSend = null;
 		switch (message[0]) {
@@ -158,6 +166,9 @@ public class Server implements Runnable {
 		case "editRecord":
 			messageToSend = editRecord(currentUserId, message, title);
 			break;
+		case "deleteRecord":
+			messageToSend = deleteRecord(message, title);
+			break;
 		}
 		if (messageToSend != null) {
 			out.println(messageToSend);
@@ -165,6 +176,7 @@ public class Server implements Runnable {
 			out.flush();
 		}
 	}
+
 	/**
 	 * 
 	 * @param message
@@ -172,8 +184,9 @@ public class Server implements Runnable {
 	 * @param title
 	 * @return
 	 * @throws SQLException
+	 * @throws IOException
 	 */
-	private String handleMenu(String[] message, int id, String title) throws SQLException {
+	private String handleMenu(String[] message, int id, String title) throws SQLException, IOException {
 		StringBuilder sb = new StringBuilder();
 		String messageToSend = null;
 		switch (message[1]) {
@@ -190,6 +203,7 @@ public class Server implements Runnable {
 									+ "\tDoctor name: " + db.getDoctorName(mr.getDoctorId()) + "\nNurse id: "
 									+ mr.getNurseId() + "\tNurse name: " + db.getNurseName(mr.getNurseId())
 									+ "\nDivision: " + mr.getDivision() + "\nDisease: " + mr.getDisease());
+							log.newEditEntry(title + " " + id, "listed entry " + mr.getRecordId());
 							break;
 						}
 					}
@@ -264,8 +278,9 @@ public class Server implements Runnable {
 	 *            Id of the doctor creating the record
 	 * @return String with the added data.
 	 * @throws SQLException
+	 * @throws IOException
 	 */
-	private String addRecord(String[] message, int id) throws SQLException {
+	private String addRecord(String[] message, int id) throws SQLException, IOException {
 		String messageToSend = null;
 		String patientId = message[1];
 		String doctorId = String.valueOf(id);
@@ -279,12 +294,15 @@ public class Server implements Runnable {
 			String patientName = db.getPatientName(Integer.parseInt(patientId));
 			String doctorName = db.getDoctorName(id);
 			String nurseName = db.getNurseName(Integer.parseInt(nurseId));
+
 			messageToSend = ("You added the following record\nPatient id: " + patientId + "\tPatient name: "
 					+ patientName + "\nDoctor id: " + id + "\tDoctor name: " + doctorName + "\nNurse id: " + nurseId
 					+ "\tNurse name: " + nurseName + "\nDivision: " + division + "\nDisease: " + disease);
 			;
+			log.newEditEntry("doctor" + " " + doctorId, "added a new journal");
 		} else {
 			System.out.println(doctorId);
+			log.newEditEntry("doctor" + " " + doctorId, "tried to add a journal without permission");
 			messageToSend = "This is not your patient";
 		}
 		return messageToSend;
@@ -305,37 +323,60 @@ public class Server implements Runnable {
 	 *            Id of the doctor creating the record
 	 * @return String with the added data.
 	 * @throws SQLException
+	 * @throws IOException
 	 */
-	private String editRecord(int editorsId, String[] message, String title) throws SQLException {
+	private String editRecord(int editorsId, String[] message, String title) throws SQLException, IOException {
 		String recordId = message[1];
 		String nurseId = message[2];
 		String division = message[3];
 		String disease = message[4];
+		StringBuilder edited = new StringBuilder();
 		for (MedicalRecord mr : getWriteableRecords(title, editorsId)) {
 			if (mr.getRecordId() == Integer.parseInt(recordId)) {
 				if (!disease.equals("doNotEdit")) {
 					mr.setDisease(disease);
+					edited.append("disease ");
 				}
 				if (!division.equals("doNotEdit")) {
 					mr.setDivision(division);
+					edited.append("division ");
 				}
 				if (!nurseId.equals("doNotEdit")) {
 					mr.setNurseId(Integer.parseInt(nurseId));
+					edited.append("nurseId ");
 				}
 				if (db.updateMedicalRecord(mr)) {
+					log.newEditEntry(title + " " + editorsId,
+							"edited following content in journal with ID " + recordId + ": " + edited.toString());
 					return ("The record after the edit\nPatient id: " + mr.getPatientId() + "\tPatient name: "
 							+ db.getPatientName(mr.getPatientId()) + "\nDoctor id: " + mr.getDoctorId()
 							+ "\tDoctor name: " + db.getDoctorName(mr.getDoctorId()) + "\nNurse id: " + nurseId
 							+ "\tNurse name: " + db.getNurseName(mr.getNurseId()) + "\nDivision: " + division
 							+ "\nDisease: " + disease);
 				} else {
+					log.newEditEntry(title + " " + editorsId, "tried to edit journal with ID : " + recordId);
 					return "Could not edit record.";
 				}
 
 			}
 		}
+		log.newEditEntry(title + " " + editorsId, "tried to edit journal with ID without permission: " + recordId);
 		return ("Not authorized to edit this record or it doesn't exist");
-
+		
 	}
 
+	private String deleteRecord(String[] message, String title) throws SQLException, IOException {
+		if (title.equals("government")) {
+			String recordId = message[1];
+			int rId = Integer.parseInt(recordId);
+			if (db.getMedicalRecord(rId) != null && db.deleteMedicalRecord(db.getMedicalRecord(rId))) {
+				log.newEditEntry(title, "delted record with ID " + recordId);
+				return ("Record with ID" + recordId + " was deleted");
+			} else {
+				return ("No record with that ID");
+			}
+		} else {
+			return ("You do not have permission to delete records");
+		}
+	}
 }

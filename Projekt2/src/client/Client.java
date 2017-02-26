@@ -118,7 +118,7 @@ public class Client {
 
 	public void printMenu() throws IOException {
 		System.out.println("Service selector");
-		System.out.println("1: List records \n2: Create new record \n3: Edit record \n0: Exit");
+		System.out.println("1: List records \n2: Create new record \n3: Edit record \n4: Delete record \n0: Exit");
 
 		// Ändra tillbaka till console.in om detta inte funkar i terminalen
 		String option = s.nextLine();
@@ -137,6 +137,10 @@ public class Client {
 			break;
 		case "3":
 			editRecord();
+			receiveMessage();
+			break;
+		case "4":
+			deleteMedicalRecord();
 			receiveMessage();
 			break;
 		case "0":
@@ -213,7 +217,17 @@ public class Client {
 		}
 		System.out.println("");
 	}
-
+	private void deleteMedicalRecord()throws IOException {
+		System.out.println("Record id: ");
+		String recordId = s.nextLine();
+		while (!checkParsability(recordId)) {
+			System.out.println("Record id: ");
+			recordId = s.nextLine();
+		}
+		String message = ("deleteRecord;" + recordId);
+		messageToSend = message;
+		sendMessage();
+	}
 	/**
 	 * This method constructs a string that will be sent to the server with the
 	 * info required to create a medical record

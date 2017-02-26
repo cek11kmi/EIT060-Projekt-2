@@ -21,6 +21,10 @@ public class Logger {
 		this.file = new File(patientName);
 		output = new FileOutputStream(file, true);
 	}
+	public Logger() throws FileNotFoundException {
+		this.file = new File("log.txt");
+		output = new FileOutputStream(file, true);
+	}
 	
 	/**
 	 * 
