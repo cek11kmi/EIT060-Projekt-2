@@ -118,7 +118,7 @@ public class Server implements Runnable {
 	} // calls run()
 
 	private void startDb() throws SQLException {
-		if (db.openConnection("serverassets/db/hospitalImproved.db")) {
+		if (db.openConnection("serverassets/db/hospital.db")) {
 			System.out.println("Database connected");
 			db.foreignKey();
 		} else {
@@ -360,7 +360,7 @@ public class Server implements Runnable {
 
 			}
 		}
-		log.newEditEntry(title + " " + editorsId, "tried to edit journal with ID without permission: " + recordId);
+		log.newEditEntry(title + " " + editorsId, "failed, due to lack of permission, to edit record with id: " + recordId);
 		return ("Not authorized to edit this record or it doesn't exist");
 		
 	}
