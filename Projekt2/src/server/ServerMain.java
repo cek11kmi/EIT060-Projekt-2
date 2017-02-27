@@ -23,17 +23,17 @@ public class ServerMain {
 		if (args.length == 1) {
 			portString = args[0];
 		}
-		// else if (cons != null){
-		// // Input host and port number
-		// System.out.println("Please input the port");
-		//
-		// System.out.print("Port: ");
-		// portString = cons.readLine();
-		//
-		// } else {
-		// System.out.println("Start with ServerMain port");
-		// //System.exit(0);
-		// }
+		 else if (cons != null){
+		 // Input host and port number
+		 System.out.println("Please input the port");
+		
+		 System.out.print("Port: ");
+		 portString = cons.readLine();
+		
+		 } else {
+		 System.out.println("Start with ServerMain port");
+		 //System.exit(0);
+		 }
 
 		ServerMain sm = new ServerMain();
 		Database db = new Database();

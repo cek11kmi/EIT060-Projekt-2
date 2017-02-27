@@ -27,11 +27,8 @@ import javax.security.cert.X509Certificate;
 public class Client {
 	private SSLSocketFactory factory;
 	private char[] trustStorePW;
-	private KeyStore ks;
 	private KeyStore ts;
 	private KeyManagerFactory kmf;
-	private String host;
-	private String port;
 	private boolean connected;
 	private SSLSocket socket;
 	private BufferedReader in;
@@ -65,8 +62,6 @@ public class Client {
 				throw new IOException(e.getMessage());
 			}
 			socket = (SSLSocket) factory.createSocket(host, port);
-			// System.out.println("\nsocket before handshake:\n" + socket +
-			// "\n");
 
 			/*
 			 * send http request
@@ -75,22 +70,6 @@ public class Client {
 			 * a forced handshake here when using PrintWriters.
 			 */
 			socket.startHandshake();
-
-			SSLSession session = socket.getSession();
-			X509Certificate cert = (X509Certificate) session.getPeerCertificateChain()[0];
-			String subject = cert.getSubjectDN().getName();
-			// System.out.println(
-			// "certificate name (subject DN field) on certificate received from
-			// server:\n" + subject + "\n");
-
-			String issuer = cert.getIssuerDN().getName();
-			// System.out.println("issuer on certificate received from
-			// server:\n" + issuer + "\n");
-
-			// System.out.println("serialnumber on certificate received from
-			// server:\n" + cert.getSerialNumber() + "\n");
-
-			// System.out.println("socket after handshake:\n" + socket + "\n");
 			System.out.println("secure connection established\n\n");
 			connected = true;
 			s = new Scanner(System.in);

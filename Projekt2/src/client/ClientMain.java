@@ -52,7 +52,7 @@ public class ClientMain {
 		boolean fileFound = false;
 		while (!fileFound ) {
 			if(certName.equals("")){
-			System.out.println("Please insert name of certificate you would like to use: ");
+			System.out.println("Please specify the path to your keystore: ");
 			 certName = cons.readLine();
 			}
 			try {
