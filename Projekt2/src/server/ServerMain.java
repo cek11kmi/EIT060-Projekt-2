@@ -2,6 +2,7 @@ package server;
 
 import java.io.Console;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.security.KeyStore;
@@ -37,6 +38,7 @@ public class ServerMain {
 		ServerMain sm = new ServerMain();
 		Database db = new Database();
 		sm.startUp(portString, db);
+		
 
 	}
 

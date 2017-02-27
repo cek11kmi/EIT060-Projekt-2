@@ -203,7 +203,7 @@ public class Server implements Runnable {
 									+ "\tDoctor name: " + db.getDoctorName(mr.getDoctorId()) + "\nNurse id: "
 									+ mr.getNurseId() + "\tNurse name: " + db.getNurseName(mr.getNurseId())
 									+ "\nDivision: " + mr.getDivision() + "\nDisease: " + mr.getDisease());
-							log.newEditEntry(title + " " + id, "listed entry " + mr.getRecordId());
+							log.newEditEntry(title + " " + id, "read record with id: " + mr.getRecordId());
 							break;
 						}
 					}
@@ -299,10 +299,10 @@ public class Server implements Runnable {
 					+ patientName + "\nDoctor id: " + id + "\tDoctor name: " + doctorName + "\nNurse id: " + nurseId
 					+ "\tNurse name: " + nurseName + "\nDivision: " + division + "\nDisease: " + disease);
 			;
-			log.newEditEntry("doctor" + " " + doctorId, "added a new journal");
+			log.newEditEntry("doctor" + " " + doctorId, "added a new record for patient with id: " + patientId);
 		} else {
 			System.out.println(doctorId);
-			log.newEditEntry("doctor" + " " + doctorId, "tried to add a journal without permission");
+			log.newEditEntry("doctor" + " " + doctorId, "tried to add a journal without permission for patient with id: " + patientId);
 			messageToSend = "This is not your patient";
 		}
 		return messageToSend;
@@ -347,7 +347,7 @@ public class Server implements Runnable {
 				}
 				if (db.updateMedicalRecord(mr)) {
 					log.newEditEntry(title + " " + editorsId,
-							"edited following content in journal with ID " + recordId + ": " + edited.toString());
+							"edited following content in record with ID " + recordId + ": " + edited.toString());
 					return ("The record after the edit\nPatient id: " + mr.getPatientId() + "\tPatient name: "
 							+ db.getPatientName(mr.getPatientId()) + "\nDoctor id: " + mr.getDoctorId()
 							+ "\tDoctor name: " + db.getDoctorName(mr.getDoctorId()) + "\nNurse id: " + nurseId
@@ -370,7 +370,7 @@ public class Server implements Runnable {
 			String recordId = message[1];
 			int rId = Integer.parseInt(recordId);
 			if (db.getMedicalRecord(rId) != null && db.deleteMedicalRecord(db.getMedicalRecord(rId))) {
-				log.newEditEntry(title, "delted record with ID " + recordId);
+				log.newEditEntry(title, "deleted record with ID " + recordId);
 				return ("Record with ID" + recordId + " was deleted");
 			} else {
 				return ("No record with that ID");
