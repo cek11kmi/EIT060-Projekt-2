@@ -24,8 +24,7 @@ public class ClientMain {
 			certName = args[2];
 			ksPW = args[3].toCharArray();
 			// Input host and port number
-		}
-		if (args.length == 0) {
+		} else if (args.length == 0) {
 			System.out.println("Please input the host and port");
 
 			System.out.print("Host: ");

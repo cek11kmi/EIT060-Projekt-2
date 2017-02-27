@@ -6,3 +6,4 @@ Mon Feb 27 16:55:05 CET 2017	doctor 2	added a new record for patient with id: 4
 Mon Feb 27 16:59:01 CET 2017	doctor 1	read record with id: 1
 Mon Feb 27 16:59:03 CET 2017	doctor 1	added a new record for patient with id: 1
 Mon Feb 27 17:04:09 CET 2017	doctor 1	read record with id: 1
+Mon Feb 27 17:06:32 CET 2017	doctor 1	read record with id: 1
