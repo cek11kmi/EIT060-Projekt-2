@@ -13,8 +13,8 @@ public class ClientMain {
 
 	public static void main(String[] args) throws IOException {
 
-		String host = "";
-		String portString = "";
+		String host = "localhost";
+		String portString = "9853";
 		String certName = "clientassets/keystores/";
 		char[] ksPW = new char[0];
 		Scanner scan = new Scanner(System.in);
@@ -24,19 +24,8 @@ public class ClientMain {
 			certName = args[2];
 			ksPW = args[3].toCharArray();
 			// Input host and port number
-		} else if (args.length == 0) {
-			System.out.println("Please input the host and port");
 
-			System.out.print("Host: ");
-			host = scan.nextLine();
-
-			System.out.print("Port: ");
-			portString = scan.nextLine();
-
-		} else {
-			System.out.println("Start with ClientMain host port");
-			System.exit(0);
-		}
+		} 
 		// this will convert string port to int
 		int port;
 		try {
@@ -52,7 +41,7 @@ public class ClientMain {
 		boolean fileFound = false;
 		while (!fileFound) {
 			if (certName.equals("clientassets/keystores/")) {
-				System.out.println("Please specify the path to your keystore: ");
+				System.out.println("Please specify the name of your keystore: ");
 				certName = certName.concat(scan.nextLine());
 
 			}

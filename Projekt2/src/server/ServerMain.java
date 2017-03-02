@@ -22,22 +22,9 @@ public class ServerMain {
 		if (args.length == 1) {
 			portString = args[0];
 		}
-		 else if (args.length==0){
-		 // Input host and port number
-		 System.out.println("Please input the port");
-		
-		 System.out.print("Port: ");
-		 portString = scan.nextLine();
-		
-		 } else {
-		 System.out.println("Start with ServerMain port");
-		 //System.exit(0);
-		 }
-
 		ServerMain sm = new ServerMain();
 		Database db = new Database();
 		sm.startUp(portString, db);
-		
 
 	}
 
