@@ -1,11 +1,11 @@
 package client;
 
-import java.io.Console;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
+import java.util.Scanner;
 
 import javax.net.ssl.KeyManagerFactory;
 
@@ -13,30 +13,19 @@ public class ClientMain {
 
 	public static void main(String[] args) throws IOException {
 
-		String host = "";
-		String portString = "";
-		String certName="";
+		String host = "localhost";
+		String portString = "9853";
+		String certName = "clientassets/keystores/";
 		char[] ksPW = new char[0];
-		Console cons = System.console();
+		Scanner scan = new Scanner(System.in);
 		if (args.length == 4) {
 			host = args[0];
 			portString = args[1];
 			certName = args[2];
 			ksPW = args[3].toCharArray();
-		} else if (cons != null){
 			// Input host and port number
-			System.out.println("Please input the host and port");
 
-			System.out.print("Host: ");
-			host = cons.readLine();
-
-			System.out.print("Port: ");
-			portString = cons.readLine();
-
-		} else {
-			System.out.println("Start with ClientMain host port");
-			System.exit(0);
-		}
+		} 
 		// this will convert string port to int
 		int port;
 		try {
@@ -50,24 +39,26 @@ public class ClientMain {
 		// exists
 		InputStream is = null;
 		boolean fileFound = false;
-		while (!fileFound ) {
-			if(certName.equals("")){
-			System.out.println("Please specify the path to your keystore: ");
-			 certName = cons.readLine();
+		while (!fileFound) {
+			if (certName.equals("clientassets/keystores/")) {
+				System.out.println("Please specify the name of your keystore: ");
+				certName = certName.concat(scan.nextLine());
+
 			}
 			try {
-				//is = new FileInputStream("clientassets/keystores/" + certName);
 				is = new FileInputStream(certName);
 				fileFound = true;
 			} catch (FileNotFoundException ex) {
-				System.out.println("File not found! Please try again.");
+				certName = "clientassets/keystores/";
+				System.out.println(certName);
+				// System.out.println("File not found! Please try again.");
 			}
 		}
 
 		// password input for the keystore
-		if(ksPW.length==0){
-		System.out.println("Please insert password: ");
-		ksPW = cons.readPassword();
+		if (ksPW.length == 0) {
+			System.out.println("Please insert password: ");
+			ksPW = scan.nextLine().toCharArray();
 		}
 		// this loads the keystore with the password provided
 		KeyStore ks;
@@ -95,7 +86,7 @@ public class ClientMain {
 		if (!(client.initConnection(kmf, host, port))) {
 			System.out.println("Connection failed!");
 		}
-		
+
 		while (client.isConnected()) {
 			client.printMenu();
 

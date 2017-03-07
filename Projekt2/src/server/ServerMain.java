@@ -1,12 +1,11 @@
 package server;
 
-import java.io.Console;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.security.KeyStore;
 import java.sql.SQLException;
+import java.util.Scanner;
 
 import javax.net.ServerSocketFactory;
 import javax.net.ssl.KeyManagerFactory;
@@ -19,26 +18,13 @@ public class ServerMain {
 
 	public static void main(String[] args) throws SQLException {
 		String portString = "9853";
-		Console cons = System.console();
+		Scanner scan = new Scanner(System.in);
 		if (args.length == 1) {
 			portString = args[0];
 		}
-		 else if (cons != null){
-		 // Input host and port number
-		 System.out.println("Please input the port");
-		
-		 System.out.print("Port: ");
-		 portString = cons.readLine();
-		
-		 } else {
-		 System.out.println("Start with ServerMain port");
-		 //System.exit(0);
-		 }
-
 		ServerMain sm = new ServerMain();
 		Database db = new Database();
 		sm.startUp(portString, db);
-		
 
 	}
 
