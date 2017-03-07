@@ -55,31 +55,31 @@ CREATE TABLE medical_records(
 
 
 INSERT INTO users(serial_number, title)
-VALUES ('10962565134263569953', 'Doctor'),
-	('10962565134263569954','Doctor'),
-	('10962565134263569950','Nurse'),
-	('10962565134263569951', 'Nurse'),
-	('10962565134263569952', 'Nurse'),
-	('10962565134263569946', 'Patient'),
-	('10962565134263569947', 'Patient'),
-	('10962565134263569948', 'Patient'),
-	('10962565134263569949', 'Patient'),
-	('10962565134263569955', 'Government');
+VALUES ('14594712769675615388', 'Doctor'),
+	('14594712769675615389','Doctor'),
+	('14594712769675615385','Nurse'),
+	('14594712769675615386', 'Nurse'),
+	('14594712769675615387', 'Nurse'),
+	('14594712769675615381', 'Patient'),
+	('14594712769675615382', 'Patient'),
+	('14594712769675615383', 'Patient'),
+	('14594712769675615384', 'Patient'),
+	('14594712769675615390', 'Government');
 
 INSERT INTO doctors(serial_number, name, division)
-VALUES ('10962565134263569953', 'Dr. Kosmos', 'General Health'),
-	('10962565134263569954', 'Dr. Dre', 'Emergency Care');
+VALUES ('14594712769675615388', 'Dr. Kosmos', 'General Health'),
+	('14594712769675615389', 'Dr. Dre', 'Emergency Care');
 
 INSERT INTO nurses(serial_number, name, division)
-VALUES	('10962565134263569950', 'Nurse House', 'General Health'),
-	('10962565134263569951', 'Nurse Snuggles', 'General Health'),
-	('10962565134263569952', 'Nurse Trump', 'Emergency Care');
+VALUES	('14594712769675615385', 'Nurse House', 'General Health'),
+	('14594712769675615386', 'Nurse Snuggles', 'General Health'),
+	('14594712769675615387', 'Nurse Trump', 'Emergency Care');
 
 INSERT INTO patients(serial_number, doctor_id, name) 
-VALUES ('10962565134263569946', '1', 'Dolan Trupm'),
-	('10962565134263569947', '2', 'Pepe Frog'),
-	('10962565134263569948', '1', 'Robbie Rotten'),
-	('10962565134263569949', '2', 'Tengil');
+VALUES ('14594712769675615381', '1', 'Dolan Trupm'),
+	('14594712769675615382', '2', 'Pepe Frog'),
+	('14594712769675615383', '1', 'Robbie Rotten'),
+	('14594712769675615384', '2', 'Tengil');
 	
 	
 INSERT INTO medical_records(patient_id, doctor_id, nurse_id, division, disease)
